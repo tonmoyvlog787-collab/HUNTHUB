@@ -1,8 +1,8 @@
 /**
  * HUNTHUB ft. Animesh - Digital Craftsmanship Interactive Application
  * Features: Header Branding ("HUNTHUB ft. Animesh"), Rupee Currency Formatting (₹),
- * Unified Category & Price Bracket Console (Slider Removed), Real-time Admin Section Category Sync,
- * Robust Multi-Item Category Section Filtering.
+ * Systematic Price Sorting (Lower price at top, higher price below),
+ * Instant Real-Time Section Sync from Admin Control Panel, Auto Photo Changer Gallery.
  */
 
 const WHATSAPP_NUMBER = "917086869464";
@@ -14,7 +14,6 @@ const DEFAULT_PRODUCTS = [];
 let storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
 let sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
 let activeCategory = "all";
-let activePricePreset = "all";
 
 document.addEventListener('DOMContentLoaded', () => {
   cleanupDemoProducts();
@@ -39,17 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Short interval polling for instant single-page sync
+  // Rapid 400ms interval polling for instant single-browser window sync
   setInterval(() => {
     const latestProds = JSON.parse(localStorage.getItem('hunthub_products')) || [];
     if (JSON.stringify(latestProds) !== JSON.stringify(storeProducts)) {
       storeProducts = latestProds;
       renderStoreProducts();
     }
-  }, 800);
+  }, 400);
 });
 
-/* Purge legacy demo items */
+/* Purge legacy demo items if present */
 function cleanupDemoProducts() {
   let stored = JSON.parse(localStorage.getItem('hunthub_products'));
   if (Array.isArray(stored) && stored.length > 0) {
@@ -129,7 +128,7 @@ function loadSiteImages() {
 }
 
 /* ==========================================
-   1. RENDER CATALOG, SECTION CATEGORIES & PRICE BRACKETS
+   1. RENDER CATALOG, INSTANT SECTION SYNC & PRICE SORTING
    ========================================== */
 function renderStoreProducts() {
   const container = document.getElementById('products-grid-container');
@@ -137,7 +136,7 @@ function renderStoreProducts() {
 
   storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || [];
   
-  let filteredList = storeProducts;
+  let filteredList = [...storeProducts];
 
   // 1. Apply Section Category Filter
   if (activeCategory !== "all") {
@@ -149,29 +148,21 @@ function renderStoreProducts() {
     });
   }
 
-  // 2. Apply Price Bracket Filter
-  if (activePricePreset === 'under20k') {
-    filteredList = filteredList.filter(p => Number(p.price) < 20000);
-  } else if (activePricePreset === '20k-50k') {
-    filteredList = filteredList.filter(p => Number(p.price) >= 20000 && Number(p.price) <= 50000);
-  } else if (activePricePreset === '50k-100k') {
-    filteredList = filteredList.filter(p => Number(p.price) > 50000 && Number(p.price) <= 100000);
-  } else if (activePricePreset === 'above100k') {
-    filteredList = filteredList.filter(p => Number(p.price) > 100000);
-  }
+  // 2. Systematic Price Sorting: Lower price at top, higher price below
+  filteredList.sort((a, b) => Number(a.price) - Number(b.price));
 
   container.innerHTML = '';
 
   if (filteredList.length === 0) {
     container.innerHTML = `
-      <div class="col-span-full p-12 text-center border border-dashed border-primary/20 bg-surface-low">
+      <div class="col-span-full p-10 sm:p-14 text-center border border-dashed border-primary/20 bg-surface-low">
         <span class="material-symbols-outlined text-4xl text-accent mb-2 block">inventory_2</span>
-        <h3 class="font-display text-xl text-primary font-bold">No Items Found</h3>
+        <h3 class="font-display text-xl text-primary font-bold">No Items in ${activeCategory === 'all' ? 'Store' : '"' + activeCategory + '"'} Section</h3>
         <p class="font-body text-xs text-secondary mt-1">
-          ${storeProducts.length === 0 ? 'No phones published yet. Add items from the Admin Panel to populate your catalog.' : 'No phones found matching the selected section and price bracket.'}
+          ${storeProducts.length === 0 ? 'No items uploaded yet. Upload phones from the Admin Panel to populate this section.' : 'No phones found matching the selected section tag.'}
         </p>
-        <button onclick="applyPriceFilter('all'); applyCategoryFilter('all');" class="mt-4 px-5 py-2 text-xs font-label uppercase font-bold text-gold border border-gold hover:bg-gold hover:text-primary transition-colors">
-          Show All Items
+        <button onclick="applyCategoryFilter('all');" class="mt-4 px-5 py-2 text-xs font-label uppercase font-bold text-gold border border-gold hover:bg-gold hover:text-primary transition-colors">
+          Show All Masterpieces
         </button>
       </div>
     `;
@@ -181,7 +172,7 @@ function renderStoreProducts() {
   filteredList.forEach((prod, index) => {
     const isEven = index % 2 !== 0;
     const article = document.createElement('article');
-    article.className = `group flex flex-col gap-5 scroll-reveal ${isEven ? 'md:mt-12' : ''}`;
+    article.className = `group flex flex-col gap-4 sm:gap-5 scroll-reveal ${isEven ? 'md:mt-10' : ''}`;
     
     const displayBadge = prod.badge || prod.category || "Recent uploaded";
     const badgeNorm = normalizeCategoryString(displayBadge);
@@ -200,19 +191,19 @@ function renderStoreProducts() {
              data-alt="${prod.description || prod.name}"
              src="${prod.image}"
              alt="${prod.name}"/>
-        <div class="absolute top-4 left-4 z-10">
+        <div class="absolute top-3 sm:top-4 left-3 sm:left-4 z-10">
           <span class="badge-tag ${badgeClass}">${displayBadge}</span>
         </div>
         ${prod.brand ? `
-          <div class="absolute top-4 right-4 bg-primary/90 text-gold font-label text-[10px] font-bold px-2.5 py-0.5 border border-gold/30 uppercase tracking-wider">
+          <div class="absolute top-3 sm:top-4 right-3 sm:right-4 bg-primary/90 text-gold font-label text-[10px] font-bold px-2.5 py-0.5 border border-gold/30 uppercase tracking-wider">
             ${prod.brand}
           </div>
         ` : ''}
       </div>
-      <div class="flex flex-col gap-2 text-center items-center">
-        <h3 class="font-display text-2xl text-primary font-semibold">${prod.name}</h3>
-        <p class="font-label text-xs text-secondary tracking-widest uppercase">${prod.tagline || 'Custom Luxury Edition'} ${prod.ram ? `| ${prod.ram} RAM` : ''}</p>
-        <p class="font-serif text-xl text-accent mt-1 font-bold">₹${Number(prod.price).toLocaleString('en-IN')}</p>
+      <div class="flex flex-col gap-1.5 sm:gap-2 text-center items-center">
+        <h3 class="font-display text-xl sm:text-2xl text-primary font-semibold">${prod.name}</h3>
+        <p class="font-label text-[10px] sm:text-xs text-secondary tracking-widest uppercase">${prod.tagline || 'Custom Luxury Edition'} ${prod.ram ? `| ${prod.ram} RAM` : ''}</p>
+        <p class="font-serif text-lg sm:text-xl text-accent font-bold">₹${Number(prod.price).toLocaleString('en-IN')}</p>
         
         <div class="flex items-center gap-3 mt-2">
           <button onclick="buyProductViaWhatsApp('${prod.name}', '₹${Number(prod.price).toLocaleString('en-IN')}')" 
@@ -234,23 +225,6 @@ function renderStoreProducts() {
   }
 }
 
-/* ==========================================
-   PRICE BRACKET FILTERING CONTROLS
-   ========================================== */
-function applyPriceFilter(presetType) {
-  activePricePreset = presetType;
-
-  document.querySelectorAll('#price-filter-presets button').forEach(btn => {
-    if (btn.getAttribute('data-filter') === presetType) {
-      btn.className = "price-filter-btn px-4 py-2 font-label text-[11px] uppercase font-bold border border-gold bg-gold text-primary tracking-wider transition-colors active shadow-sm";
-    } else {
-      btn.className = "price-filter-btn px-4 py-2 font-label text-[11px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors";
-    }
-  });
-
-  renderStoreProducts();
-}
-
 function applyCategoryFilter(categoryName) {
   activeCategory = categoryName;
 
@@ -265,7 +239,7 @@ function applyCategoryFilter(categoryName) {
   renderStoreProducts();
   
   if (categoryName !== 'all') {
-    showToast('Section Filter Active', `Displaying "${categoryName}" section items.`);
+    showToast('Section Active', `Displaying "${categoryName}" section (Sorted low to high price).`);
   }
 }
 

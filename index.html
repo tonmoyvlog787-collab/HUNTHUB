@@ -162,82 +162,46 @@
 
 
   <!-- ==================== FRAME 1: CURATED COLLECTIONS ==================== -->
-  <section id="collections" class="w-full max-w-[1240px] mx-auto px-4 sm:px-8 md:px-16 py-16 sm:py-24 border-b border-accent/10">
+  <section id="collections" class="w-full max-w-[1240px] mx-auto px-4 sm:px-8 md:px-16 py-12 sm:py-20 border-b border-accent/10">
     
     <!-- Section Header -->
     <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
       <span class="font-label text-xs text-accent uppercase tracking-[0.2em] mb-3 block scroll-reveal">The Masterpieces</span>
       <h2 class="font-display text-2xl sm:text-4xl md:text-5xl text-primary font-bold mb-4 scroll-reveal delay-1">Curated Collections</h2>
       <p class="font-body text-secondary text-sm sm:text-base leading-relaxed scroll-reveal delay-2 font-light">
-        Explore our definitive range of luxury mobile craftsmanship. Filter by category section or price bracket in Rupees (<strong class="text-primary">₹</strong>).
+        Items are systematically ordered by price (lower price at top, higher price below). Select any section category to view instant live uploads.
       </p>
     </div>
 
-    <!-- ==================== LUXURY UNIFIED FILTER CONSOLE ==================== -->
-    <div class="max-w-4xl mx-auto mb-12 bg-surface-low border border-accent/20 p-5 sm:p-7 shadow-sm scroll-reveal space-y-6">
-      
-      <!-- 1. Target Section Category Bar -->
-      <div>
-        <div class="flex items-center gap-2 mb-3">
-          <span class="material-symbols-outlined text-gold">grid_view</span>
-          <span class="font-label text-xs text-primary font-bold uppercase tracking-wider">1. Select Target Section:</span>
-        </div>
-        
-        <div class="flex flex-wrap items-center gap-2" id="category-filter-tabs">
-          <button onclick="applyCategoryFilter('all')" class="category-tab-btn active" data-category="all">
-            All Sections
-          </button>
-          <button onclick="applyCategoryFilter('Expensive')" class="category-tab-btn" data-category="Expensive">
-            💎 Expensive
-          </button>
-          <button onclick="applyCategoryFilter('Recent uploaded')" class="category-tab-btn" data-category="Recent uploaded">
-            ✨ Recent Uploaded
-          </button>
-          <button onclick="applyCategoryFilter('Premium')" class="category-tab-btn" data-category="Premium">
-            👑 Premium
-          </button>
-          <button onclick="applyCategoryFilter('Mid range')" class="category-tab-btn" data-category="Mid range">
-            ⚖️ Mid Range
-          </button>
-          <button onclick="applyCategoryFilter('Low range')" class="category-tab-btn" data-category="Low range">
-            🏷️ Low Range
-          </button>
-          <button onclick="applyCategoryFilter('Urgent sale')" class="category-tab-btn" data-category="Urgent sale">
-            🔥 Urgent Sale
-          </button>
-        </div>
+    <!-- ==================== CLEAN SECTION CATEGORY FILTER TABS ==================== -->
+    <div class="mb-10 overflow-x-auto no-scrollbar pb-3 scroll-reveal">
+      <div class="flex justify-center items-center gap-2 sm:gap-3 min-w-max mx-auto px-2" id="category-filter-tabs">
+        <button onclick="applyCategoryFilter('all')" class="category-tab-btn active" data-category="all">
+          All Masterpieces
+        </button>
+        <button onclick="applyCategoryFilter('Expensive')" class="category-tab-btn" data-category="Expensive">
+          💎 Expensive
+        </button>
+        <button onclick="applyCategoryFilter('Recent uploaded')" class="category-tab-btn" data-category="Recent uploaded">
+          ✨ Recent Uploaded
+        </button>
+        <button onclick="applyCategoryFilter('Premium')" class="category-tab-btn" data-category="Premium">
+          👑 Premium
+        </button>
+        <button onclick="applyCategoryFilter('Mid range')" class="category-tab-btn" data-category="Mid range">
+          ⚖️ Mid Range
+        </button>
+        <button onclick="applyCategoryFilter('Low range')" class="category-tab-btn" data-category="Low range">
+          🏷️ Low Range
+        </button>
+        <button onclick="applyCategoryFilter('Urgent sale')" class="category-tab-btn" data-category="Urgent sale">
+          🔥 Urgent Sale
+        </button>
       </div>
-
-      <!-- 2. Price Bracket Filter Pills (Slider Bar Removed as requested) -->
-      <div class="border-t border-accent/15 pt-5">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="material-symbols-outlined text-gold">payments</span>
-          <span class="font-label text-xs text-primary font-bold uppercase tracking-wider">2. Filter by Price Bracket (₹):</span>
-        </div>
-
-        <div class="flex flex-wrap gap-2" id="price-filter-presets">
-          <button onclick="applyPriceFilter('all')" class="price-filter-btn px-4 py-2 font-label text-[11px] uppercase font-bold border border-gold bg-gold text-primary tracking-wider transition-colors active" data-filter="all">
-            🏷️ All Prices
-          </button>
-          <button onclick="applyPriceFilter('under20k')" class="price-filter-btn px-4 py-2 font-label text-[11px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="under20k">
-            💰 Under ₹20,000
-          </button>
-          <button onclick="applyPriceFilter('20k-50k')" class="price-filter-btn px-4 py-2 font-label text-[11px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="20k-50k">
-            💵 ₹20,000 – ₹50,000
-          </button>
-          <button onclick="applyPriceFilter('50k-100k')" class="price-filter-btn px-4 py-2 font-label text-[11px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="50k-100k">
-            💶 ₹50,000 – ₹1,00,000
-          </button>
-          <button onclick="applyPriceFilter('above100k')" class="price-filter-btn px-4 py-2 font-label text-[11px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="above100k">
-            💎 Above ₹1,00,000
-          </button>
-        </div>
-      </div>
-
     </div>
 
     <!-- Dynamic Products Grid Container -->
-    <div id="products-grid-container" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16 sm:gap-y-24">
+    <div id="products-grid-container" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12 sm:gap-y-20">
       <!-- Populated dynamically in app.js -->
     </div>
   </section>
