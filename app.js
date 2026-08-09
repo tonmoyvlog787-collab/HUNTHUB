@@ -1,7 +1,8 @@
 /**
  * HUNTHUB - Digital Craftsmanship Interactive Application
- * Features: Starting Loading Intro Animation ("WELCOME TO HUNTHUB DEVELOPED BY TONMOY BORA"),
- * WhatsApp Buy Redirect (+91 7086869464), User Phone Selling Requests, Selections/Cart Management with Dynamic Recalculation & Clear All
+ * Features: Starting Loading Intro Animation ("WELCOME TO HUNTHUB DEVELOPED BY ft.tonmoy"),
+ * Dynamic Price Range Filter, WhatsApp Buy Redirect (+91 7086869464), User Phone Selling Requests,
+ * Selections/Cart Management with Dynamic Recalculation & Clear All
  */
 
 const WHATSAPP_NUMBER = "917086869464";
@@ -53,10 +54,13 @@ const DEFAULT_PRODUCTS = [
 // App State
 let storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
 let sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
+let activePriceFilter = "all";
+let activeMaxPrice = 30000;
 
 document.addEventListener('DOMContentLoaded', () => {
   initLoadingScreen();
   renderStoreProducts();
+  initPriceFilter();
   initScrollAnimations();
   initIconRippleEffects();
   initNavigationTracker();
@@ -83,19 +87,39 @@ function initLoadingScreen() {
 }
 
 /* ==========================================
-   1. RENDER STORE PRODUCTS (Dynamic Catalog)
+   1. RENDER STORE PRODUCTS & PRICE RANGE FILTER
    ========================================== */
-function renderStoreProducts() {
+function renderStoreProducts(filterPredicate = null) {
   const container = document.getElementById('products-grid-container');
   if (!container) return;
 
   storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
+  
+  let filteredList = storeProducts;
+  if (typeof filterPredicate === 'function') {
+    filteredList = storeProducts.filter(filterPredicate);
+  }
+
   container.innerHTML = '';
 
-  storeProducts.forEach((prod, index) => {
+  if (filteredList.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full p-12 text-center border border-dashed border-primary/20 bg-surface-low">
+        <span class="material-symbols-outlined text-4xl text-accent mb-2 block">filter_alt_off</span>
+        <h3 class="font-display text-xl text-primary font-bold">No Products Found</h3>
+        <p class="font-body text-xs text-secondary mt-1">No items match your selected price filter range.</p>
+        <button onclick="applyPriceFilter('all')" class="mt-4 px-5 py-2 text-xs font-label uppercase font-bold text-gold border border-gold hover:bg-gold hover:text-primary transition-colors">
+          Reset Price Filter
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  filteredList.forEach((prod, index) => {
     const isEven = index % 2 !== 0;
     const article = document.createElement('article');
-    article.className = `group flex flex-col gap-6 scroll-reveal ${isEven ? 'md:mt-16' : ''}`;
+    article.className = `group flex flex-col gap-6 scroll-reveal ${isEven ? 'md:mt-12' : ''}`;
     
     article.innerHTML = `
       <div class="w-full aspect-[4/5] bg-surface-low overflow-hidden relative border border-accent/15 photo-clickable shadow-sm">
@@ -131,6 +155,60 @@ function renderStoreProducts() {
 
   if (typeof initAutoPhotoGallery === 'function') {
     initAutoPhotoGallery();
+  }
+}
+
+/* Price Range Filter Logic */
+function initPriceFilter() {
+  const slider = document.getElementById('price-range-slider');
+  const priceValEl = document.getElementById('price-range-value');
+
+  if (slider && priceValEl) {
+    slider.addEventListener('input', (e) => {
+      const val = Number(e.target.value);
+      activeMaxPrice = val;
+      priceValEl.textContent = `$${val.toLocaleString()}`;
+
+      // Reset preset button styling
+      document.querySelectorAll('.price-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-gold', 'text-primary', 'border-gold');
+        btn.classList.add('border-accent/30', 'text-secondary');
+      });
+
+      renderStoreProducts(item => Number(item.price) <= activeMaxPrice);
+    });
+  }
+}
+
+function applyPriceFilter(presetType) {
+  const slider = document.getElementById('price-range-slider');
+  const priceValEl = document.getElementById('price-range-value');
+
+  // Update preset active styles
+  document.querySelectorAll('.price-filter-btn').forEach(btn => {
+    if (btn.getAttribute('data-filter') === presetType) {
+      btn.className = "price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-gold bg-gold text-primary tracking-wider transition-colors active";
+    } else {
+      btn.className = "price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors";
+    }
+  });
+
+  if (presetType === 'all') {
+    if (slider) slider.value = 30000;
+    if (priceValEl) priceValEl.textContent = "$30,000";
+    renderStoreProducts();
+  } else if (presetType === 'under12k') {
+    if (slider) slider.value = 12000;
+    if (priceValEl) priceValEl.textContent = "$12,000";
+    renderStoreProducts(item => Number(item.price) < 12000);
+  } else if (presetType === '12k-18k') {
+    if (slider) slider.value = 18000;
+    if (priceValEl) priceValEl.textContent = "$12,000 - $18,000";
+    renderStoreProducts(item => Number(item.price) >= 12000 && Number(item.price) <= 18000);
+  } else if (presetType === 'above18k') {
+    if (slider) slider.value = 30000;
+    if (priceValEl) priceValEl.textContent = "Above $18,000";
+    renderStoreProducts(item => Number(item.price) > 18000);
   }
 }
 
@@ -690,7 +768,7 @@ function showToast(title, message) {
 
   toast.innerHTML = `
     <div class="font-label text-xs text-gold tracking-widest mb-1 font-bold">${title}</div>
-    <div class="font-body text-sm opacity-90">${message}</div>
+    <div class="font-body text-xs opacity-90">${message}</div>
   `;
 
   toast.classList.add('show');

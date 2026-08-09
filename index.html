@@ -49,7 +49,7 @@
       <h1 class="intro-brand-title">WELCOME TO HUNTHUB</h1>
       
       <p class="intro-developer-credit">
-        DEVELOPED BY <span class="text-white font-bold border-b border-gold pb-0.5">TONMOY BORA</span>
+        DEVELOPED BY <span class="text-white font-bold border-b border-gold pb-0.5">ft.tonmoy</span>
       </p>
 
       <div class="intro-progress-bar">
@@ -136,7 +136,7 @@
       </h1>
 
       <p class="font-body text-base sm:text-lg md:text-xl text-secondary max-w-2xl mb-8 leading-relaxed font-light scroll-reveal delay-2">
-        Forged from heritage. Engineered for tomorrow. Experience the pinnacle of mobile luxury by <strong class="text-primary font-semibold">HUNTHUB</strong>. Buy directly via WhatsApp or sell your premium device safely.
+        Forged from heritage. Engineered for tomorrow. Experience the pinnacle of mobile luxury by <strong class="text-primary font-semibold">HUNTHUB</strong>. Developed by <span class="text-accent font-semibold">ft.tonmoy</span>.
       </p>
 
       <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-stretch sm:items-center scroll-reveal delay-3">
@@ -164,12 +164,47 @@
   <section id="collections" class="w-full max-w-[1240px] mx-auto px-4 sm:px-8 md:px-16 py-16 sm:py-24 border-b border-accent/10">
     
     <!-- Section Header -->
-    <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-20">
+    <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
       <span class="font-label text-xs text-accent uppercase tracking-[0.2em] mb-3 block scroll-reveal">The Masterpieces</span>
       <h2 class="font-display text-2xl sm:text-4xl md:text-5xl text-primary font-bold mb-4 scroll-reveal delay-1">Curated Collections</h2>
       <p class="font-body text-secondary text-sm sm:text-base leading-relaxed scroll-reveal delay-2 font-light">
-        Explore our definitive range of digital craftsmanship. Buy instantly via WhatsApp (<strong class="text-primary">+91 7086869464</strong>) or inspect photo details.
+        Explore our definitive range of digital craftsmanship. Filter by price range or buy instantly via WhatsApp (<strong class="text-primary">+91 7086869464</strong>).
       </p>
+    </div>
+
+    <!-- ==================== PRICE RANGE FILTER CONTROLS ==================== -->
+    <div class="max-w-3xl mx-auto mb-12 sm:mb-16 bg-surface-low border border-accent/20 p-5 sm:p-7 shadow-sm scroll-reveal">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b border-accent/15 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-gold">tune</span>
+          <span class="font-label text-xs text-primary font-bold uppercase tracking-wider">Filter Catalog by Price</span>
+        </div>
+        <div class="font-serif text-sm text-accent font-semibold">
+          Max Price: <span id="price-range-value" class="text-primary font-bold">$30,000</span>
+        </div>
+      </div>
+
+      <!-- Range Slider -->
+      <div class="space-y-4">
+        <input type="range" id="price-range-slider" min="1000" max="30000" step="500" value="30000"
+               class="w-full h-2 bg-accent/20 rounded-lg appearance-none cursor-pointer accent-gold focus:outline-none">
+
+        <!-- Preset Quick Filter Buttons -->
+        <div class="flex flex-wrap gap-2 pt-2" id="price-filter-presets">
+          <button onclick="applyPriceFilter('all')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-gold bg-gold text-primary tracking-wider transition-colors active" data-filter="all">
+            All Prices
+          </button>
+          <button onclick="applyPriceFilter('under12k')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="under12k">
+            Under $12,000
+          </button>
+          <button onclick="applyPriceFilter('12k-18k')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="12k-18k">
+            $12,000 - $18,000
+          </button>
+          <button onclick="applyPriceFilter('above18k')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="above18k">
+            Above $18,000
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Dynamic Products Grid Container -->
@@ -642,7 +677,7 @@
         <div class="flex flex-col gap-3 max-w-md">
           <span class="font-display font-bold text-2xl sm:text-3xl text-primary tracking-tighter">HUNTHUB</span>
           <p class="font-body text-xs sm:text-sm text-secondary leading-relaxed font-light">
-            Elevating the standard of digital interaction through uncompromising craftsmanship and timeless design. Developed by Tonmoy Bora.
+            Elevating the standard of digital interaction through uncompromising craftsmanship and timeless design. Developed by <span class="text-primary font-semibold">ft.tonmoy</span>.
           </p>
         </div>
 
@@ -667,7 +702,7 @@
 
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-accent/15 text-center sm:text-left">
         <p class="font-label text-[10px] sm:text-[11px] tracking-widest text-secondary uppercase">
-          © 2026 HUNTHUB DIGITAL CRAFTSMANSHIP. DEVELOPED BY TONMOY BORA. ALL RIGHTS RESERVED.
+          © 2026 HUNTHUB DIGITAL CRAFTSMANSHIP. DEVELOPED BY FT.TONMOY. ALL RIGHTS RESERVED.
         </p>
         <div class="flex gap-4 justify-center">
           <a class="text-secondary hover:text-gold transition-colors" href="https://wa.me/917086869464" target="_blank" title="WhatsApp Concierge"><span class="material-symbols-outlined text-[20px]">chat</span></a>
