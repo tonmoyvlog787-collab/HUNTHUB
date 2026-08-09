@@ -7,7 +7,7 @@
 
 const WHATSAPP_NUMBER = "917086869464";
 
-// Initial Catalog Store Items in Rupees (₹)
+// Initial Catalog Store Items in Rupees (₹) with Explicit Categories & Badges
 const DEFAULT_PRODUCTS = [
   {
     id: "prod-1",
@@ -18,6 +18,7 @@ const DEFAULT_PRODUCTS = [
     price: 145000,
     currency: "₹",
     badge: "Premium",
+    category: "Premium",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAd6YphimFNcYpZTImXq_Q0L_Js0Enj5QUGJk8qyxxZdPhdsC35zxg_dIQfUIUKEVcyaT9eIREb3l2cEhhx6iuXGedpdQ_o7PFaPtD5DdDx2w3eb5rfnGX90WuraBq_mWi9urRXqeQtfVybBiQlCd_tR-AtG6DJD4zqcbkgBJsLbaB_NRmKXj4-A2jxP1jcfLVGaj5vtkUHepoq9VmgfzcAES_ZrPB1ox9xG0FTYCnhKZrvwHYd0OiEBQ",
     description: "Obsidian Apex: Minimalist luxury smartphone with matte black titanium finish and gold camera rims."
   },
@@ -30,6 +31,7 @@ const DEFAULT_PRODUCTS = [
     price: 182000,
     currency: "₹",
     badge: "Expensive",
+    category: "Expensive",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAhwFw0HDGSe9-mFl_xhDFyBfPBmZRSwwL3AwYGITnqEAYGXe0NcomFnnAZUsq8NtVDZBeEkDUZqgogamRx4HlADM2C11vixKWOv0o2Q4rPgw7n7vAwTqU7mOa41J417FCP-ZCn8BEt1E_scSA7Shy4iL1xfLE4cGdY_SpZ3QY128TaVH8pqOjWRL1KjurQQ_9rSvPSo7MxIgqZ-UN0AfczDIaQhXhNTGv0H_ord6HoA1y5DCUDatYjjA",
     description: "Aura Rose: Polished rose gold mobile device with intricate carbon fiber back panel."
   },
@@ -42,7 +44,8 @@ const DEFAULT_PRODUCTS = [
     price: 68000,
     currency: "₹",
     badge: "Mid range",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBfA1ZpMWg_eTW_NyZbhwHAof-azoul7Z81JiJcQ_hYp2T_BYvJM_AMZuPoCcbpM0eG-CxO-Cz5LVFWKCEtDcbDHxPqiXemjpf00FrKpbvtt6rEXEvrwimptThC5PiEU14_LOvc3ClRK4H4Yg9rO-RyC95iAmq4w0SPmNWIHyEkgrzMXQPJQjWR991nMojl4Q3OBHDP7QhxmtPO7Ndc4mR3rysv7eC7Uvn2OPDxJ-Njff_CDXl1p1Szhw",
+    category: "Mid range",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBfA1ZpMWg_eTW_NyZbhwHAof-azoul7Z81JiJcQ_hYp2T_BYvJM_AMZuPoCcbpM0eG-CxO-Cz5LVFWKCEtDcbDHxPqiXemjpf00FrKpbvtt6rEXEvrwimptThC5PiEU14_LOvc3ClRK4H4Yg9rO-RyC95iAmq4w0SPmNWIHyEkgrzMXJQjWR991nMojl4Q3OBHDP7QhxmtPO7Ndc4mR3rysv7eC7Uvn2OPDxJ-Njff_CDXl1p1Szhw",
     description: "Silver Ghost: Razor-thin aerospace aluminum chassis side profile shot."
   },
   {
@@ -54,6 +57,7 @@ const DEFAULT_PRODUCTS = [
     price: 240000,
     currency: "₹",
     badge: "Urgent sale",
+    category: "Urgent sale",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCzp9Fz0L2fl_kNOpxnZaSTRMpOQyT34gxC41sBCAL9ILpeU8KW1db2Ov0IKjDSYXs6ioFPuGiUAFeoPWSXmNa-hNoFluhgF4ZzEXpgTrOinXevA4b0UpxqHOUd3WIZuBd2JdzMA6oDi4MD7Rx6QG_1Hf3AWEi9vLtPuCB2Al6OzL4Euvp7NXzA_awrISTgoDcoGPqPkfi51HTNNCriYX8YbZ_mQVXkW_Wn1RTNpwBcVjLaYrmVIozBYA",
     description: "Heritage Noir: Alligator leather clad back panel with platinum bezel details."
   },
@@ -66,6 +70,7 @@ const DEFAULT_PRODUCTS = [
     price: 32000,
     currency: "₹",
     badge: "Low range",
+    category: "Low range",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A",
     description: "Lite Prestige: Slim entry-level luxury phone."
   }
@@ -89,6 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initAutoPhotoGallery();
   initMobileMenu();
   initSellDeviceForm();
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'hunthub_site_images') loadSiteImages();
+    if (e.key === 'hunthub_products') renderStoreProducts();
+  });
 });
 
 /* ==========================================
@@ -148,7 +158,7 @@ function loadSiteImages() {
 }
 
 /* ==========================================
-   1. RENDER CATALOG, RUPEE CURRENCY & PRICE DYNAMIC SLIDER
+   1. RENDER CATALOG, SECTION CATEGORIES & RUPEE CURRENCY
    ========================================== */
 function renderStoreProducts(filterPredicate = null) {
   const container = document.getElementById('products-grid-container');
@@ -158,12 +168,17 @@ function renderStoreProducts(filterPredicate = null) {
   
   let filteredList = storeProducts;
 
-  // Apply Category Filter
+  // Apply Section Category Filter (Case-insensitive & space-tolerant)
   if (activeCategory !== "all") {
-    filteredList = filteredList.filter(p => (p.badge === activeCategory) || (p.category === activeCategory));
+    filteredList = filteredList.filter(p => {
+      const b = (p.badge || '').toLowerCase().trim();
+      const c = (p.category || '').toLowerCase().trim();
+      const target = activeCategory.toLowerCase().trim();
+      return b === target || c === target;
+    });
   }
 
-  // Apply Custom Filter Predicate (Price)
+  // Apply Price Filter Predicate
   if (typeof filterPredicate === 'function') {
     filteredList = filteredList.filter(filterPredicate);
   }
@@ -174,10 +189,10 @@ function renderStoreProducts(filterPredicate = null) {
     container.innerHTML = `
       <div class="col-span-full p-12 text-center border border-dashed border-primary/20 bg-surface-low">
         <span class="material-symbols-outlined text-4xl text-accent mb-2 block">filter_alt_off</span>
-        <h3 class="font-display text-xl text-primary font-bold">No Products Found</h3>
-        <p class="font-body text-xs text-secondary mt-1">No items match your selected category or price filter range.</p>
+        <h3 class="font-display text-xl text-primary font-bold">No Products Found in ${activeCategory === 'all' ? 'Store' : activeCategory} Section</h3>
+        <p class="font-body text-xs text-secondary mt-1">No items match your selected section tag or price filter range.</p>
         <button onclick="applyPriceFilter('all'); applyCategoryFilter('all');" class="mt-4 px-5 py-2 text-xs font-label uppercase font-bold text-gold border border-gold hover:bg-gold hover:text-primary transition-colors">
-          Reset All Filters
+          Show All Masterpieces
         </button>
       </div>
     `;
@@ -189,14 +204,15 @@ function renderStoreProducts(filterPredicate = null) {
     const article = document.createElement('article');
     article.className = `group flex flex-col gap-5 scroll-reveal ${isEven ? 'md:mt-12' : ''}`;
     
-    // Determine badge CSS class
+    const displayBadge = prod.badge || prod.category || "Premium";
+
     let badgeClass = "border border-primary/20 bg-surface/80 text-primary";
-    if (prod.badge === "Expensive") badgeClass = "badge-tag-expensive";
-    else if (prod.badge === "Recent uploaded") badgeClass = "badge-tag-recent";
-    else if (prod.badge === "Premium") badgeClass = "badge-tag-premium";
-    else if (prod.badge === "Mid range") badgeClass = "badge-tag-midrange";
-    else if (prod.badge === "Low range") badgeClass = "badge-tag-lowrange";
-    else if (prod.badge === "Urgent sale") badgeClass = "badge-tag-urgentsale";
+    if (displayBadge === "Expensive") badgeClass = "badge-tag-expensive";
+    else if (displayBadge === "Recent uploaded") badgeClass = "badge-tag-recent";
+    else if (displayBadge === "Premium") badgeClass = "badge-tag-premium";
+    else if (displayBadge === "Mid range") badgeClass = "badge-tag-midrange";
+    else if (displayBadge === "Low range") badgeClass = "badge-tag-lowrange";
+    else if (displayBadge === "Urgent sale") badgeClass = "badge-tag-urgentsale";
 
     article.innerHTML = `
       <div class="w-full aspect-[4/5] bg-surface-low overflow-hidden relative border border-accent/15 photo-clickable shadow-sm">
@@ -204,11 +220,9 @@ function renderStoreProducts(filterPredicate = null) {
              data-alt="${prod.description || prod.name}"
              src="${prod.image}"
              alt="${prod.name}"/>
-        ${prod.badge ? `
-          <div class="absolute top-4 left-4 z-10">
-            <span class="badge-tag ${badgeClass}">${prod.badge}</span>
-          </div>
-        ` : ''}
+        <div class="absolute top-4 left-4 z-10">
+          <span class="badge-tag ${badgeClass}">${displayBadge}</span>
+        </div>
         ${prod.brand ? `
           <div class="absolute top-4 right-4 bg-primary/90 text-gold font-label text-[10px] font-bold px-2.5 py-0.5 border border-gold/30 uppercase tracking-wider">
             ${prod.brand}
@@ -247,11 +261,9 @@ function initPriceFilter() {
 
   storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
   
-  // Calculate max price currently available in dataset
   const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 50000);
 
   if (slider && priceValEl) {
-    // Dynamically cap slider max to highest dataset price
     slider.max = maxPriceInDataset;
     slider.value = maxPriceInDataset;
     activeMaxPrice = maxPriceInDataset;
@@ -262,7 +274,6 @@ function initPriceFilter() {
       activeMaxPrice = val;
       priceValEl.textContent = `₹${val.toLocaleString('en-IN')}`;
 
-      // Reset preset button styling
       document.querySelectorAll('.price-filter-btn').forEach(btn => {
         btn.classList.remove('bg-gold', 'text-primary', 'border-gold');
         btn.classList.add('border-accent/30', 'text-secondary');
@@ -321,6 +332,10 @@ function applyCategoryFilter(categoryName) {
   });
 
   renderStoreProducts(item => Number(item.price) <= activeMaxPrice);
+  
+  if (categoryName !== 'all') {
+    showToast('Section Filter Active', `Displaying only "${categoryName}" items.`);
+  }
 }
 
 /* ==========================================
@@ -361,7 +376,7 @@ function buyCartViaWhatsApp() {
 }
 
 /* ==========================================
-   3. USER PHONE SELLING FORM (Bulletproof Image Upload & Form Fix)
+   3. USER PHONE SELLING FORM
    ========================================== */
 let uploadedImageUrls = [];
 
@@ -416,7 +431,6 @@ function initSellDeviceForm() {
         return;
       }
 
-      // Robust image fallback so form submission NEVER fails
       const finalImages = uploadedImageUrls.length > 0 ? uploadedImageUrls : [
         "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A"
       ];

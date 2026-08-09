@@ -2,7 +2,7 @@
  * HUNTHUB ft. Animesh - Dedicated Admin Control Center JavaScript
  * Features: Secure Cryptographic Authentication (ID: hunthub@100animesh, Pass: animesh@2008),
  * Rupee Currency System (₹), Category Badge Tag Management (Expensive, Recent uploaded, Premium, Mid range, Low range, Urgent sale),
- * RAM Selector, Direct Gallery/File Upload Components, Global Site Media Control Panel (Save & Apply Fix).
+ * RAM Selector, Direct Gallery/File Upload Components, Global Site Media Control Panel.
  */
 
 const AUTH_ID_HASH = "de472f5b951a5eb2ec32d36ccd9d2ca77c83fa8fe0d2147ecd7cae1b51d8f622";
@@ -22,6 +22,7 @@ const DEFAULT_PRODUCTS = [
     price: 145000,
     currency: "₹",
     badge: "Premium",
+    category: "Premium",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAd6YphimFNcYpZTImXq_Q0L_Js0Enj5QUGJk8qyxxZdPhdsC35zxg_dIQfUIUKEVcyaT9eIREb3l2cEhhx6iuXGedpdQ_o7PFaPtD5DdDx2w3eb5rfnGX90WuraBq_mWi9urRXqeQtfVybBiQlCd_tR-AtG6DJD4zqcbkgBJsLbaB_NRmKXj4-A2jxP1jcfLVGaj5vtkUHepoq9VmgfzcAES_ZrPB1ox9xG0FTYCnhKZrvwHYd0OiEBQ",
     description: "Obsidian Apex: Minimalist luxury smartphone with matte black titanium finish and gold camera rims."
   },
@@ -34,6 +35,7 @@ const DEFAULT_PRODUCTS = [
     price: 182000,
     currency: "₹",
     badge: "Expensive",
+    category: "Expensive",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAhwFw0HDGSe9-mFl_xhDFyBfPBmZRSwwL3AwYGITnqEAYGXe0NcomFnnAZUsq8NtVDZBeEkDUZqgogamRx4HlADM2C11vixKWOv0o2Q4rPgw7n7vAwTqU7mOa41J417FCP-ZCn8BEt1E_scSA7Shy4iL1xfLE4cGdY_SpZ3QY128TaVH8pqOjWRL1KjurQQ_9rSvPSo7MxIgqZ-UN0AfczDIaQhXhNTGv0H_ord6HoA1y5DCUDatYjjA",
     description: "Aura Rose: Polished rose gold mobile device with intricate carbon fiber back panel."
   },
@@ -46,6 +48,7 @@ const DEFAULT_PRODUCTS = [
     price: 68000,
     currency: "₹",
     badge: "Mid range",
+    category: "Mid range",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBfA1ZpMWg_eTW_NyZbhwHAof-azoul7Z81JiJcQ_hYp2T_BYvJM_AMZuPoCcbpM0eG-CxO-Cz5LVFWKCEtDcbDHxPqiXemjpf00FrKpbvtt6rEXEvrwimptThC5PiEU14_LOvc3ClRK4H4Yg9rO-RyC95iAmq4w0SPmNWIHyEkgrzMXJQjWR991nMojl4Q3OBHDP7QhxmtPO7Ndc4mR3rysv7eC7Uvn2OPDxJ-Njff_CDXl1p1Szhw",
     description: "Silver Ghost: Razor-thin aerospace aluminum chassis side profile shot."
   },
@@ -58,6 +61,7 @@ const DEFAULT_PRODUCTS = [
     price: 240000,
     currency: "₹",
     badge: "Urgent sale",
+    category: "Urgent sale",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCzp9Fz0L2fl_kNOpxnZaSTRMpOQyT34gxC41sBCAL9ILpeU8KW1db2Ov0IKjDSYXs6ioFPuGiUAFeoPWSXmNa-hNoFluhgF4ZzEXpgTrOinXevA4b0UpxqHOUd3WIZuBd2JdzMA6oDi4MD7Rx6QG_1Hf3AWEi9vLtPuCB2Al6OzL4Euvp7NXzA_awrISTgoDcoGPqPkfi51HTNNCriYX8YbZ_mQVXkW_Wn1RTNpwBcVjLaYrmVIozBYA",
     description: "Heritage Noir: Alligator leather clad back panel with platinum bezel details."
   }
@@ -364,15 +368,31 @@ function renderAdminRequests() {
           "${req.description}"
         </p>
 
-        <!-- Admin Retail Price Input in Rupees (Adding Profit Margin) -->
-        <div class="pt-2 border-t border-dark-border">
-          <label class="font-label text-[11px] text-gold font-bold block mb-1">
-            Store Retail Price (₹) - Add Profit Margin:
-          </label>
-          <div class="flex gap-2">
-            <span class="bg-dark-bg text-gold font-bold px-3 py-2 border border-dark-border flex items-center">₹</span>
-            <input type="number" id="retail-price-${req.id}" value="${defaultRetailPrice}" 
-                   class="w-full bg-dark-bg border border-dark-border px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-gold">
+        <!-- Admin Target Section & Retail Price Input -->
+        <div class="pt-2 border-t border-dark-border space-y-3">
+          <div>
+            <label class="font-label text-[11px] text-gold font-bold block mb-1">
+              Assign Target Section Category:
+            </label>
+            <select id="request-badge-${req.id}" class="w-full bg-dark-bg border border-dark-border px-3 py-2 text-xs text-gold font-bold focus:outline-none focus:border-gold">
+              <option value="Recent uploaded" selected>✨ Recent uploaded</option>
+              <option value="Expensive">💎 Expensive</option>
+              <option value="Premium">👑 Premium</option>
+              <option value="Mid range">⚖️ Mid range</option>
+              <option value="Low range">🏷️ Low range</option>
+              <option value="Urgent sale">🔥 Urgent sale</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-label text-[11px] text-gold font-bold block mb-1">
+              Store Retail Price (₹) - Add Profit Margin:
+            </label>
+            <div class="flex gap-2">
+              <span class="bg-dark-bg text-gold font-bold px-3 py-2 border border-dark-border flex items-center">₹</span>
+              <input type="number" id="retail-price-${req.id}" value="${defaultRetailPrice}" 
+                     class="w-full bg-dark-bg border border-dark-border px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-gold">
+            </div>
           </div>
         </div>
       </div>
@@ -400,7 +420,10 @@ function approveSellRequest(requestId) {
   if (!req) return;
 
   const retailInput = document.getElementById(`retail-price-${requestId}`);
+  const badgeInput = document.getElementById(`request-badge-${requestId}`);
+
   const finalPrice = retailInput ? Number(retailInput.value) : Math.round(req.expectedPrice * 1.15);
+  const selectedBadge = badgeInput ? badgeInput.value : "Recent uploaded";
 
   const newProduct = {
     id: `prod-${Date.now()}`,
@@ -410,7 +433,8 @@ function approveSellRequest(requestId) {
     tagline: `${req.storage} | ${req.condition}`,
     price: finalPrice,
     currency: "₹",
-    badge: "Recent uploaded",
+    badge: selectedBadge,
+    category: selectedBadge,
     image: req.images[0] || "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A",
     description: `Certified Pre-Owned ${req.model} (${req.storage}, ${req.condition}, Battery: ${req.batteryHealth}). Seller Notes: ${req.description}`
   };
@@ -429,7 +453,7 @@ function approveSellRequest(requestId) {
     setTimeout(() => {
       renderAdminRequests();
       renderAdminProducts();
-      showToast('Approved & Published', `${req.model} published for ₹${finalPrice.toLocaleString('en-IN')}!`);
+      showToast('Approved & Published', `${req.model} published to "${selectedBadge}" section for ₹${finalPrice.toLocaleString('en-IN')}!`);
     }, 350);
   }
 }
@@ -482,24 +506,24 @@ function renderAdminProducts() {
     card.id = `product-card-${prod.id}`;
     card.className = "bg-dark-card border border-dark-border p-5 flex flex-col justify-between space-y-4 hover:border-gold/40 transition-all duration-300";
 
+    const displayBadge = prod.badge || prod.category || "Premium";
+
     let badgeClass = "bg-dark-bg text-gold border border-gold/40";
-    if (prod.badge === "Expensive") badgeClass = "bg-amber-950/40 text-amber-400 border border-amber-800";
-    else if (prod.badge === "Recent uploaded") badgeClass = "bg-blue-950/40 text-blue-400 border border-blue-800";
-    else if (prod.badge === "Premium") badgeClass = "bg-purple-950/40 text-purple-400 border border-purple-800";
-    else if (prod.badge === "Mid range") badgeClass = "bg-emerald-950/40 text-emerald-400 border border-emerald-800";
-    else if (prod.badge === "Low range") badgeClass = "bg-yellow-950/40 text-yellow-400 border border-yellow-800";
-    else if (prod.badge === "Urgent sale") badgeClass = "bg-red-950/40 text-red-400 border border-red-800";
+    if (displayBadge === "Expensive") badgeClass = "bg-amber-950/40 text-amber-400 border border-amber-800";
+    else if (displayBadge === "Recent uploaded") badgeClass = "bg-blue-950/40 text-blue-400 border border-blue-800";
+    else if (displayBadge === "Premium") badgeClass = "bg-purple-950/40 text-purple-400 border border-purple-800";
+    else if (displayBadge === "Mid range") badgeClass = "bg-emerald-950/40 text-emerald-400 border border-emerald-800";
+    else if (displayBadge === "Low range") badgeClass = "bg-yellow-950/40 text-yellow-400 border border-yellow-800";
+    else if (displayBadge === "Urgent sale") badgeClass = "bg-red-950/40 text-red-400 border border-red-800";
 
     card.innerHTML = `
       <div class="space-y-3">
         <!-- Image & Badge -->
         <div class="w-full h-44 bg-dark-bg border border-dark-border overflow-hidden relative">
           <img src="${prod.image}" class="w-full h-full object-cover object-center" alt="${prod.name}">
-          ${prod.badge ? `
-            <div class="absolute top-3 left-3 z-10">
-              <span class="font-label text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 ${badgeClass}">${prod.badge}</span>
-            </div>
-          ` : ''}
+          <div class="absolute top-3 left-3 z-10">
+            <span class="font-label text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 ${badgeClass}">${displayBadge}</span>
+          </div>
           ${prod.ram ? `
             <div class="absolute top-3 right-3 bg-dark-bg/90 text-white font-label text-[9px] font-bold px-2 py-0.5 border border-dark-border">
               ${prod.ram} RAM
@@ -552,7 +576,7 @@ function openEditModal(productId) {
   document.getElementById('edit-prod-price').value = prod.price;
   document.getElementById('edit-prod-ram').value = prod.ram || '8GB';
   document.getElementById('edit-prod-tagline').value = prod.tagline || '';
-  document.getElementById('edit-prod-badge').value = prod.badge || 'Premium';
+  document.getElementById('edit-prod-badge').value = prod.badge || prod.category || 'Premium';
   document.getElementById('edit-prod-image').value = prod.image;
   document.getElementById('edit-prod-desc').value = prod.description || '';
 
@@ -613,6 +637,7 @@ function initEditProductForm() {
           ram: ram,
           tagline: tagline,
           badge: badge,
+          category: badge,
           image: image,
           description: desc
         };
@@ -620,7 +645,7 @@ function initEditProductForm() {
         localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
         closeEditModal();
         renderAdminProducts();
-        showToast('Changes Saved', `${title} updated successfully.`);
+        showToast('Changes Saved', `${title} assigned to "${badge}" section.`);
       }
     });
   }
@@ -685,6 +710,7 @@ function initAddProductForm() {
         ram: ram,
         tagline: tagline || "Custom Luxury Edition",
         badge: badge || "Premium",
+        category: badge || "Premium",
         image: image,
         description: desc || title
       };
@@ -697,13 +723,13 @@ function initAddProductForm() {
       if (previewEl) previewEl.innerHTML = `<span class="text-xs text-secondary">Image Preview</span>`;
       toggleAddProductForm();
       renderAdminProducts();
-      showToast('Item Added', `${title} published to catalog for ₹${price.toLocaleString('en-IN')}!`);
+      showToast('Item Added', `${title} published to "${badge}" section for ₹${price.toLocaleString('en-IN')}!`);
     });
   }
 }
 
 /* ==========================================
-   5. GLOBAL SITE MEDIA CONTROL PANEL (ROBUST FIX)
+   5. GLOBAL SITE MEDIA CONTROL PANEL
    ========================================== */
 function initSiteImagesControl() {
   const existingImages = JSON.parse(localStorage.getItem('hunthub_site_images')) || {};

@@ -144,7 +144,7 @@
     <!-- Header Title -->
     <div class="mb-6 sm:mb-10">
       <h1 class="font-display text-2xl sm:text-4xl text-white font-bold mb-1 sm:mb-2">Admin Command Center</h1>
-      <p class="font-body text-xs sm:text-sm text-secondary">Manage selling requests, store inventory, global site media & custom pricing in Rupees (₹).</p>
+      <p class="font-body text-xs sm:text-sm text-secondary">Manage selling requests, store inventory, section categories & site media in Rupees (₹).</p>
     </div>
 
     <!-- Navigation Tabs (Mobile Scrollable) -->
@@ -183,7 +183,7 @@
       <div class="flex justify-between items-center border-b border-dark-border/60 pb-3">
         <h2 class="font-display text-xl text-white font-bold flex items-center gap-2">
           <span>Review Phone Submissions</span>
-          <span class="text-xs font-label text-gold font-normal">(Set profit margin in ₹ before publishing)</span>
+          <span class="text-xs font-label text-gold font-normal">(Assign Section Category & Retail Price in ₹)</span>
         </h2>
         <button onclick="renderAdminRequests()" class="text-xs font-label text-accent hover:text-white flex items-center gap-1">
           <span class="material-symbols-outlined text-sm">refresh</span> Refresh
@@ -244,14 +244,14 @@
               <input type="text" id="add-prod-tagline" placeholder="e.g. Titanium & Sapphire" class="w-full bg-dark-bg border border-dark-border px-3 py-2 text-sm text-white focus:outline-none focus:border-gold">
             </div>
             <div>
-              <label class="font-label text-xs text-secondary font-bold block mb-1">Badge Tag / Section Category *</label>
-              <select id="add-prod-badge" class="w-full bg-dark-bg border border-dark-border px-3 py-2 text-sm text-white focus:outline-none focus:border-gold">
-                <option value="Expensive">Expensive</option>
-                <option value="Recent uploaded">Recent uploaded</option>
-                <option value="Premium" selected>Premium</option>
-                <option value="Mid range">Mid range</option>
-                <option value="Low range">Low range</option>
-                <option value="Urgent sale">Urgent sale</option>
+              <label class="font-label text-xs text-secondary font-bold block mb-1">Target Section Category *</label>
+              <select id="add-prod-badge" class="w-full bg-dark-bg border border-dark-border px-3 py-2 text-sm text-white focus:outline-none focus:border-gold font-bold text-gold">
+                <option value="Expensive">💎 Expensive</option>
+                <option value="Recent uploaded">✨ Recent uploaded</option>
+                <option value="Premium" selected>👑 Premium</option>
+                <option value="Mid range">⚖️ Mid range</option>
+                <option value="Low range">🏷️ Low range</option>
+                <option value="Urgent sale">🔥 Urgent sale</option>
               </select>
             </div>
           </div>
@@ -272,7 +272,7 @@
           </div>
 
           <div class="flex gap-3 pt-2">
-            <button type="submit" class="bg-gold text-primary px-6 py-2.5 font-label text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors">Publish to Store</button>
+            <button type="submit" class="bg-gold text-primary px-6 py-2.5 font-label text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors">Publish to Section</button>
             <button type="button" onclick="toggleAddProductForm()" class="bg-dark-border text-white px-5 py-2.5 font-label text-xs uppercase tracking-wider">Cancel</button>
           </div>
         </form>
@@ -446,14 +446,14 @@
             <input type="number" id="edit-prod-price" required class="w-full bg-dark-bg border border-dark-border px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold">
           </div>
           <div>
-            <label class="font-label text-xs text-secondary font-bold block mb-1">Badge Tag / Section Category *</label>
-            <select id="edit-prod-badge" class="w-full bg-dark-bg border border-dark-border px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold">
-              <option value="Expensive">Expensive</option>
-              <option value="Recent uploaded">Recent uploaded</option>
-              <option value="Premium">Premium</option>
-              <option value="Mid range">Mid range</option>
-              <option value="Low range">Low range</option>
-              <option value="Urgent sale">Urgent sale</option>
+            <label class="font-label text-xs text-secondary font-bold block mb-1">Target Section Category *</label>
+            <select id="edit-prod-badge" class="w-full bg-dark-bg border border-dark-border px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold font-bold text-gold">
+              <option value="Expensive">💎 Expensive</option>
+              <option value="Recent uploaded">✨ Recent uploaded</option>
+              <option value="Premium">👑 Premium</option>
+              <option value="Mid range">⚖️ Mid range</option>
+              <option value="Low range">🏷️ Low range</option>
+              <option value="Urgent sale">🔥 Urgent sale</option>
             </select>
           </div>
         </div>
