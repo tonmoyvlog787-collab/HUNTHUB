@@ -1,64 +1,85 @@
 /**
- * HUNTHUB - Digital Craftsmanship Interactive Application
- * Features: Starting Loading Intro Animation ("WELCOME TO HUNTHUB DEVELOPED BY ft.tonmoy"),
- * Dynamic Price Range Filter, WhatsApp Buy Redirect (+91 7086869464), User Phone Selling Requests,
- * Selections/Cart Management with Dynamic Recalculation & Clear All
+ * HUNTHUB ft. Animesh - Digital Craftsmanship Interactive Application
+ * Features: Header Branding ("HUNTHUB ft. Animesh"), Rupee Currency Formatting (₹),
+ * Dynamic Price Filter Cap, Category Filter Tabs (Expensive, Recent uploaded, Premium, Mid range, Low range, Urgent sale),
+ * Robust File Upload for Phone Sellers, Cart & Selection Recalculation, Auto Photo Changer Gallery.
  */
 
 const WHATSAPP_NUMBER = "917086869464";
 
-// Initial Catalog Store Items
+// Initial Catalog Store Items in Rupees (₹)
 const DEFAULT_PRODUCTS = [
   {
     id: "prod-1",
     name: "Obsidian Apex",
-    tagline: "Titanium & Sapphire",
-    price: 14500,
-    currency: "€",
-    badge: "New Release",
+    brand: "Apple",
+    ram: "16GB",
+    tagline: "Titanium & Sapphire | 16GB RAM",
+    price: 145000,
+    currency: "₹",
+    badge: "Premium",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAd6YphimFNcYpZTImXq_Q0L_Js0Enj5QUGJk8qyxxZdPhdsC35zxg_dIQfUIUKEVcyaT9eIREb3l2cEhhx6iuXGedpdQ_o7PFaPtD5DdDx2w3eb5rfnGX90WuraBq_mWi9urRXqeQtfVybBiQlCd_tR-AtG6DJD4zqcbkgBJsLbaB_NRmKXj4-A2jxP1jcfLVGaj5vtkUHepoq9VmgfzcAES_ZrPB1ox9xG0FTYCnhKZrvwHYd0OiEBQ",
-    description: "Obsidian Apex: Minimalist luxury smartphone with matte black titanium finish and gold camera rims on marble plinth."
+    description: "Obsidian Apex: Minimalist luxury smartphone with matte black titanium finish and gold camera rims."
   },
   {
     id: "prod-2",
     name: "Aura Rose",
-    tagline: "18k Rose Gold",
-    price: 18200,
-    currency: "€",
-    badge: "Exclusive",
+    brand: "Samsung",
+    ram: "12GB",
+    tagline: "18k Rose Gold | 12GB RAM",
+    price: 182000,
+    currency: "₹",
+    badge: "Expensive",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAhwFw0HDGSe9-mFl_xhDFyBfPBmZRSwwL3AwYGITnqEAYGXe0NcomFnnAZUsq8NtVDZBeEkDUZqgogamRx4HlADM2C11vixKWOv0o2Q4rPgw7n7vAwTqU7mOa41J417FCP-ZCn8BEt1E_scSA7Shy4iL1xfLE4cGdY_SpZ3QY128TaVH8pqOjWRL1KjurQQ_9rSvPSo7MxIgqZ-UN0AfczDIaQhXhNTGv0H_ord6HoA1y5DCUDatYjjA",
     description: "Aura Rose: Polished rose gold mobile device with intricate carbon fiber back panel."
   },
   {
     id: "prod-3",
     name: "Silver Ghost",
-    tagline: "Aerospace Aluminum",
-    price: 11000,
-    currency: "€",
-    badge: "Limited Edition",
+    brand: "OnePlus",
+    ram: "8GB",
+    tagline: "Aerospace Aluminum | 8GB RAM",
+    price: 68000,
+    currency: "₹",
+    badge: "Mid range",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBfA1ZpMWg_eTW_NyZbhwHAof-azoul7Z81JiJcQ_hYp2T_BYvJM_AMZuPoCcbpM0eG-CxO-Cz5LVFWKCEtDcbDHxPqiXemjpf00FrKpbvtt6rEXEvrwimptThC5PiEU14_LOvc3ClRK4H4Yg9rO-RyC95iAmq4w0SPmNWIHyEkgrzMXQPJQjWR991nMojl4Q3OBHDP7QhxmtPO7Ndc4mR3rysv7eC7Uvn2OPDxJ-Njff_CDXl1p1Szhw",
     description: "Silver Ghost: Razor-thin aerospace aluminum chassis side profile shot."
   },
   {
     id: "prod-4",
     name: "Heritage Noir",
-    tagline: "Alligator & Platinum",
-    price: 22000,
-    currency: "€",
-    badge: "Masterpiece",
+    brand: "Apple",
+    ram: "16GB",
+    tagline: "Alligator & Platinum | 16GB RAM",
+    price: 240000,
+    currency: "₹",
+    badge: "Urgent sale",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCzp9Fz0L2fl_kNOpxnZaSTRMpOQyT34gxC41sBCAL9ILpeU8KW1db2Ov0IKjDSYXs6ioFPuGiUAFeoPWSXmNa-hNoFluhgF4ZzEXpgTrOinXevA4b0UpxqHOUd3WIZuBd2JdzMA6oDi4MD7Rx6QG_1Hf3AWEi9vLtPuCB2Al6OzL4Euvp7NXzA_awrISTgoDcoGPqPkfi51HTNNCriYX8YbZ_mQVXkW_Wn1RTNpwBcVjLaYrmVIozBYA",
     description: "Heritage Noir: Alligator leather clad back panel with platinum bezel details."
+  },
+  {
+    id: "prod-5",
+    name: "Lite Prestige",
+    brand: "Xiaomi",
+    ram: "6GB",
+    tagline: "Ultra Thin Metallic | 6GB RAM",
+    price: 32000,
+    currency: "₹",
+    badge: "Low range",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A",
+    description: "Lite Prestige: Slim entry-level luxury phone."
   }
 ];
 
 // App State
 let storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
 let sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
-let activePriceFilter = "all";
-let activeMaxPrice = 30000;
+let activeCategory = "all";
+let activeMaxPrice = 300000;
 
 document.addEventListener('DOMContentLoaded', () => {
   initLoadingScreen();
+  loadSiteImages();
   renderStoreProducts();
   initPriceFilter();
   initScrollAnimations();
@@ -77,7 +98,6 @@ function initLoadingScreen() {
   const loadingScreen = document.getElementById('loading-screen');
   if (!loadingScreen) return;
 
-  // Auto-dismiss loading screen after animation completes (3.2s)
   setTimeout(() => {
     loadingScreen.classList.add('fade-out');
     setTimeout(() => {
@@ -86,8 +106,49 @@ function initLoadingScreen() {
   }, 3200);
 }
 
+/* Load Global Site Custom Media from localStorage */
+function loadSiteImages() {
+  const siteImages = JSON.parse(localStorage.getItem('hunthub_site_images'));
+  if (!siteImages) return;
+
+  if (siteImages.logoUrl) {
+    const logoContainer = document.getElementById('site-logo-img-container');
+    if (logoContainer) {
+      logoContainer.innerHTML = `<img src="${siteImages.logoUrl}" class="w-6 h-6 object-contain inline-block mr-1">`;
+    }
+  }
+
+  if (siteImages.heroBgUrl) {
+    const heroBg = document.getElementById('site-hero-bg-container');
+    if (heroBg) {
+      heroBg.style.backgroundImage = `url('${siteImages.heroBgUrl}')`;
+      heroBg.style.opacity = '0.35';
+    }
+  }
+
+  if (siteImages.sovereignImgUrl) {
+    const sovereignImg = document.getElementById('site-sovereign-img');
+    if (sovereignImg) sovereignImg.src = siteImages.sovereignImgUrl;
+  }
+
+  if (siteImages.heritageImgUrl) {
+    const heritageImg = document.getElementById('site-heritage-img');
+    if (heritageImg) heritageImg.src = siteImages.heritageImgUrl;
+  }
+
+  if (siteImages.opticsImgUrl) {
+    const opticsImg = document.getElementById('site-optics-img');
+    if (opticsImg) opticsImg.src = siteImages.opticsImgUrl;
+  }
+
+  if (siteImages.aegisImgUrl) {
+    const aegisImg = document.getElementById('site-aegis-img');
+    if (aegisImg) aegisImg.src = siteImages.aegisImgUrl;
+  }
+}
+
 /* ==========================================
-   1. RENDER STORE PRODUCTS & PRICE RANGE FILTER
+   1. RENDER CATALOG, RUPEE CURRENCY & PRICE DYNAMIC SLIDER
    ========================================== */
 function renderStoreProducts(filterPredicate = null) {
   const container = document.getElementById('products-grid-container');
@@ -96,8 +157,15 @@ function renderStoreProducts(filterPredicate = null) {
   storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
   
   let filteredList = storeProducts;
+
+  // Apply Category Filter
+  if (activeCategory !== "all") {
+    filteredList = filteredList.filter(p => (p.badge === activeCategory) || (p.category === activeCategory));
+  }
+
+  // Apply Custom Filter Predicate (Price)
   if (typeof filterPredicate === 'function') {
-    filteredList = storeProducts.filter(filterPredicate);
+    filteredList = filteredList.filter(filterPredicate);
   }
 
   container.innerHTML = '';
@@ -107,9 +175,9 @@ function renderStoreProducts(filterPredicate = null) {
       <div class="col-span-full p-12 text-center border border-dashed border-primary/20 bg-surface-low">
         <span class="material-symbols-outlined text-4xl text-accent mb-2 block">filter_alt_off</span>
         <h3 class="font-display text-xl text-primary font-bold">No Products Found</h3>
-        <p class="font-body text-xs text-secondary mt-1">No items match your selected price filter range.</p>
-        <button onclick="applyPriceFilter('all')" class="mt-4 px-5 py-2 text-xs font-label uppercase font-bold text-gold border border-gold hover:bg-gold hover:text-primary transition-colors">
-          Reset Price Filter
+        <p class="font-body text-xs text-secondary mt-1">No items match your selected category or price filter range.</p>
+        <button onclick="applyPriceFilter('all'); applyCategoryFilter('all');" class="mt-4 px-5 py-2 text-xs font-label uppercase font-bold text-gold border border-gold hover:bg-gold hover:text-primary transition-colors">
+          Reset All Filters
         </button>
       </div>
     `;
@@ -119,8 +187,17 @@ function renderStoreProducts(filterPredicate = null) {
   filteredList.forEach((prod, index) => {
     const isEven = index % 2 !== 0;
     const article = document.createElement('article');
-    article.className = `group flex flex-col gap-6 scroll-reveal ${isEven ? 'md:mt-12' : ''}`;
+    article.className = `group flex flex-col gap-5 scroll-reveal ${isEven ? 'md:mt-12' : ''}`;
     
+    // Determine badge CSS class
+    let badgeClass = "border border-primary/20 bg-surface/80 text-primary";
+    if (prod.badge === "Expensive") badgeClass = "badge-tag-expensive";
+    else if (prod.badge === "Recent uploaded") badgeClass = "badge-tag-recent";
+    else if (prod.badge === "Premium") badgeClass = "badge-tag-premium";
+    else if (prod.badge === "Mid range") badgeClass = "badge-tag-midrange";
+    else if (prod.badge === "Low range") badgeClass = "badge-tag-lowrange";
+    else if (prod.badge === "Urgent sale") badgeClass = "badge-tag-urgentsale";
+
     article.innerHTML = `
       <div class="w-full aspect-[4/5] bg-surface-low overflow-hidden relative border border-accent/15 photo-clickable shadow-sm">
         <img class="w-full h-full object-cover object-center" 
@@ -128,18 +205,23 @@ function renderStoreProducts(filterPredicate = null) {
              src="${prod.image}"
              alt="${prod.name}"/>
         ${prod.badge ? `
-          <div class="absolute top-6 left-6 border border-primary/20 px-3 py-1 bg-surface/80 backdrop-blur-md">
-            <span class="font-label text-[10px] text-primary tracking-widest uppercase font-semibold">${prod.badge}</span>
+          <div class="absolute top-4 left-4 z-10">
+            <span class="badge-tag ${badgeClass}">${prod.badge}</span>
+          </div>
+        ` : ''}
+        ${prod.brand ? `
+          <div class="absolute top-4 right-4 bg-primary/90 text-gold font-label text-[10px] font-bold px-2.5 py-0.5 border border-gold/30 uppercase tracking-wider">
+            ${prod.brand}
           </div>
         ` : ''}
       </div>
       <div class="flex flex-col gap-2 text-center items-center">
         <h3 class="font-display text-2xl text-primary font-semibold">${prod.name}</h3>
-        <p class="font-label text-xs text-secondary tracking-widest uppercase">${prod.tagline || 'Custom Luxury Edition'}</p>
-        <p class="font-serif text-lg text-accent mt-1">${prod.currency || '$'} ${Number(prod.price).toLocaleString()}</p>
+        <p class="font-label text-xs text-secondary tracking-widest uppercase">${prod.tagline || 'Custom Luxury Edition'} ${prod.ram ? `| ${prod.ram} RAM` : ''}</p>
+        <p class="font-serif text-xl text-accent mt-1 font-bold">₹${Number(prod.price).toLocaleString('en-IN')}</p>
         
-        <div class="flex items-center gap-3 mt-3">
-          <button onclick="buyProductViaWhatsApp('${prod.name}', '${prod.currency || '$'}${prod.price}')" 
+        <div class="flex items-center gap-3 mt-2">
+          <button onclick="buyProductViaWhatsApp('${prod.name}', '₹${Number(prod.price).toLocaleString('en-IN')}')" 
                   class="btn-whatsapp px-5 py-2 font-label text-[11px] uppercase tracking-wider font-bold flex items-center gap-1.5 btn-classic">
             <span class="material-symbols-outlined text-sm">chat</span> Buy via WhatsApp
           </button>
@@ -158,16 +240,27 @@ function renderStoreProducts(filterPredicate = null) {
   }
 }
 
-/* Price Range Filter Logic */
+/* Price Range Filter Logic (Fixes Cap to Highest Available Catalog Price) */
 function initPriceFilter() {
   const slider = document.getElementById('price-range-slider');
   const priceValEl = document.getElementById('price-range-value');
 
+  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
+  
+  // Calculate max price currently available in dataset
+  const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 50000);
+
   if (slider && priceValEl) {
+    // Dynamically cap slider max to highest dataset price
+    slider.max = maxPriceInDataset;
+    slider.value = maxPriceInDataset;
+    activeMaxPrice = maxPriceInDataset;
+    priceValEl.textContent = `₹${maxPriceInDataset.toLocaleString('en-IN')}`;
+
     slider.addEventListener('input', (e) => {
       const val = Number(e.target.value);
       activeMaxPrice = val;
-      priceValEl.textContent = `$${val.toLocaleString()}`;
+      priceValEl.textContent = `₹${val.toLocaleString('en-IN')}`;
 
       // Reset preset button styling
       document.querySelectorAll('.price-filter-btn').forEach(btn => {
@@ -184,7 +277,6 @@ function applyPriceFilter(presetType) {
   const slider = document.getElementById('price-range-slider');
   const priceValEl = document.getElementById('price-range-value');
 
-  // Update preset active styles
   document.querySelectorAll('.price-filter-btn').forEach(btn => {
     if (btn.getAttribute('data-filter') === presetType) {
       btn.className = "price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-gold bg-gold text-primary tracking-wider transition-colors active";
@@ -193,30 +285,49 @@ function applyPriceFilter(presetType) {
     }
   });
 
+  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
+  const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 50000);
+
   if (presetType === 'all') {
-    if (slider) slider.value = 30000;
-    if (priceValEl) priceValEl.textContent = "$30,000";
+    if (slider) { slider.max = maxPriceInDataset; slider.value = maxPriceInDataset; }
+    if (priceValEl) priceValEl.textContent = `₹${maxPriceInDataset.toLocaleString('en-IN')}`;
     renderStoreProducts();
-  } else if (presetType === 'under12k') {
-    if (slider) slider.value = 12000;
-    if (priceValEl) priceValEl.textContent = "$12,000";
-    renderStoreProducts(item => Number(item.price) < 12000);
-  } else if (presetType === '12k-18k') {
-    if (slider) slider.value = 18000;
-    if (priceValEl) priceValEl.textContent = "$12,000 - $18,000";
-    renderStoreProducts(item => Number(item.price) >= 12000 && Number(item.price) <= 18000);
-  } else if (presetType === 'above18k') {
-    if (slider) slider.value = 30000;
-    if (priceValEl) priceValEl.textContent = "Above $18,000";
-    renderStoreProducts(item => Number(item.price) > 18000);
+  } else if (presetType === 'under50k') {
+    const targetVal = Math.min(50000, maxPriceInDataset);
+    if (slider) slider.value = targetVal;
+    if (priceValEl) priceValEl.textContent = `₹${targetVal.toLocaleString('en-IN')}`;
+    renderStoreProducts(item => Number(item.price) < 50000);
+  } else if (presetType === '50k-150k') {
+    const targetVal = Math.min(150000, maxPriceInDataset);
+    if (slider) slider.value = targetVal;
+    if (priceValEl) priceValEl.textContent = `₹50,000 - ₹1,50,000`;
+    renderStoreProducts(item => Number(item.price) >= 50000 && Number(item.price) <= 150000);
+  } else if (presetType === 'above150k') {
+    if (slider) slider.value = maxPriceInDataset;
+    if (priceValEl) priceValEl.textContent = `Above ₹1,50,000`;
+    renderStoreProducts(item => Number(item.price) > 150000);
   }
+}
+
+function applyCategoryFilter(categoryName) {
+  activeCategory = categoryName;
+
+  document.querySelectorAll('#category-filter-tabs button').forEach(btn => {
+    if (btn.getAttribute('data-category') === categoryName) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  renderStoreProducts(item => Number(item.price) <= activeMaxPrice);
 }
 
 /* ==========================================
    2. WHATSAPP PURCHASING REDIRECT (+91 7086869464)
    ========================================== */
 function buyProductViaWhatsApp(productName, price, customNotes = "") {
-  const message = `Hello HuntHub Luxury Concierge! 👋\n\nI am interested in purchasing:\n📌 Item: ${productName}\n💰 Price: ${price}\n${customNotes ? `📝 Notes: ${customNotes}\n` : ''}\nPlease guide me through the checkout & courier delivery process.`;
+  const message = `Hello HuntHub Concierge! 👋\n\nI am interested in purchasing:\n📌 Item: ${productName}\n💰 Price: ${price}\n${customNotes ? `📝 Notes: ${customNotes}\n` : ''}\nPlease guide me through the checkout & courier delivery process.`;
   
   const encodedMsg = encodeURIComponent(message);
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMsg}`;
@@ -231,14 +342,14 @@ function buyCartViaWhatsApp() {
   const qtyDisplay = document.getElementById('qty-display');
   const totalDisplay = document.getElementById('total-display');
   const qty = qtyDisplay ? qtyDisplay.textContent : '1';
-  const total = totalDisplay ? totalDisplay.textContent : '$4,250.00';
+  const total = totalDisplay ? totalDisplay.textContent : '₹3,40,000.00';
 
   if (qty === '0') {
     showToast('Empty Selection', 'Please select at least 1 item before purchasing.');
     return;
   }
 
-  const message = `Hello HuntHub Concierge! 🛒\n\nI want to complete my selection purchase:\n\n📱 Item: HuntHub Series X – Obsidian Edition\n🔢 Quantity: ${qty}\n💰 Total Amount: ${total}\n💎 Customization: 1TB SSD | 24k Gold Accents | Engraving: "J.H."\n\nPlease confirm availability and payment details.`;
+  const message = `Hello HuntHub Concierge! 🛒\n\nI want to complete my selection purchase:\n\n📱 Item: HuntHub Series X – Obsidian Edition\n🔢 Quantity: ${qty}\n💰 Total Amount: ${total}\n💎 Customization: 1TB SSD | 16GB RAM | 24k Gold Accents | Engraving: "J.H."\n\nPlease confirm availability and payment details.`;
 
   const encodedMsg = encodeURIComponent(message);
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMsg}`;
@@ -250,7 +361,7 @@ function buyCartViaWhatsApp() {
 }
 
 /* ==========================================
-   3. USER PHONE SELLING FORM (Pending Admin Approval)
+   3. USER PHONE SELLING FORM (Bulletproof Image Upload & Form Fix)
    ========================================== */
 let uploadedImageUrls = [];
 
@@ -265,6 +376,11 @@ function initSellDeviceForm() {
       previewContainer.innerHTML = '';
       uploadedImageUrls = [];
 
+      if (files.length === 0) {
+        previewContainer.innerHTML = `<span class="text-xs text-secondary italic">Selected photos will preview here.</span>`;
+        return;
+      }
+
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -272,7 +388,7 @@ function initSellDeviceForm() {
           uploadedImageUrls.push(imgUrl);
 
           const imgThumb = document.createElement('div');
-          imgThumb.className = 'w-20 h-20 relative border border-accent/30 overflow-hidden';
+          imgThumb.className = 'w-16 h-16 relative border border-accent/30 overflow-hidden shrink-0';
           imgThumb.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover">`;
           previewContainer.appendChild(imgThumb);
         };
@@ -285,6 +401,7 @@ function initSellDeviceForm() {
     sellForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
+      const brand = document.getElementById('sell-brand') ? document.getElementById('sell-brand').value.trim() : 'Generic';
       const model = document.getElementById('sell-model').value.trim();
       const expectedPrice = document.getElementById('sell-price').value.trim();
       const condition = document.getElementById('sell-condition').value;
@@ -295,17 +412,19 @@ function initSellDeviceForm() {
       const description = document.getElementById('sell-desc').value.trim();
 
       if (!model || !expectedPrice || !ownerPhone) {
-        showToast('Incomplete Form', 'Please enter Model Name, Expected Price, and Contact Phone Number.');
+        showToast('Incomplete Form', 'Please enter Brand, Model Name, Expected Price, and Contact Phone Number.');
         return;
       }
 
+      // Robust image fallback so form submission NEVER fails
       const finalImages = uploadedImageUrls.length > 0 ? uploadedImageUrls : [
         "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A"
       ];
 
       const newRequest = {
         id: `req-${Date.now()}`,
-        model: model,
+        brand: brand || "Generic",
+        model: `${brand ? brand + ' ' : ''}${model}`,
         expectedPrice: Number(expectedPrice),
         condition: condition,
         batteryHealth: batteryHealth ? `${batteryHealth}%` : "Not specified",
@@ -323,10 +442,12 @@ function initSellDeviceForm() {
       localStorage.setItem('hunthub_sell_requests', JSON.stringify(sellRequests));
 
       sellForm.reset();
-      if (previewContainer) previewContainer.innerHTML = '';
+      if (previewContainer) {
+        previewContainer.innerHTML = `<span class="text-xs text-secondary italic">Selected photos will preview here.</span>`;
+      }
       uploadedImageUrls = [];
 
-      showToast('Submission Successful', 'Your selling request has been submitted to the Admin Panel for review!');
+      showToast('Submission Successful', 'Your device request has been submitted to the Admin Panel for review!');
     });
   }
 }
@@ -335,7 +456,7 @@ function initSellDeviceForm() {
    4. SELECTIONS / CART DYNAMIC CALCULATIONS & CLEAR ALL
    ========================================== */
 let cartState = {
-  itemPrice: 4250,
+  itemPrice: 340000,
   quantity: 1
 };
 
@@ -353,7 +474,7 @@ function initCartAndSelections() {
 
   function updatePrices() {
     const totalAmount = cartState.itemPrice * cartState.quantity;
-    const formattedTotal = `$${totalAmount.toLocaleString('en-US')}.00`;
+    const formattedTotal = `₹${totalAmount.toLocaleString('en-IN')}.00`;
 
     if (qtyDisplay) qtyDisplay.textContent = cartState.quantity;
     if (subtotalDisplay) subtotalDisplay.textContent = formattedTotal;
@@ -364,8 +485,8 @@ function initCartAndSelections() {
   function clearCartUI() {
     cartState.quantity = 0;
     if (qtyDisplay) qtyDisplay.textContent = '0';
-    if (subtotalDisplay) subtotalDisplay.textContent = '$0.00';
-    if (totalDisplay) totalDisplay.textContent = '$0.00';
+    if (subtotalDisplay) subtotalDisplay.textContent = '₹0.00';
+    if (totalDisplay) totalDisplay.textContent = '₹0.00';
     if (cartBadge) cartBadge.textContent = '0';
 
     if (cartArticle) {

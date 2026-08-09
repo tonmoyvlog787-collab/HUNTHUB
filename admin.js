@@ -1,18 +1,14 @@
 /**
- * HUNTHUB - Executive Admin Control Center JavaScript
+ * HUNTHUB ft. Animesh - Dedicated Admin Control Center JavaScript
  * Features: Secure Cryptographic Authentication (ID: hunthub@100animesh, Pass: animesh@2008),
- * Anti-SQL Injection Sanitizer, Session Storage Token Check, Rate Limiting Protection,
- * Pending Requests Review, Profit Margin Setting, Approval to Catalog, Instant Rejection Removal, Published Inventory Editing Modal & Deletion.
+ * Rupee Currency System (₹), Category Badge Tag Management (Expensive, Recent uploaded, Premium, Mid range, Low range, Urgent sale),
+ * RAM Selector, Direct Gallery/File Upload Components, Global Site Media Control Panel.
  */
 
-// Cryptographic SHA-256 Hashes of Credentials
-// Admin ID: "hunthub@100animesh"
-// Password: "animesh@2008"
 const AUTH_ID_HASH = "de472f5b951a5eb2ec32d36ccd9d2ca77c83fa8fe0d2147ecd7cae1b51d8f622";
 const AUTH_PASS_HASH = "6da85943d7c90757dec97b5391d34131fa82ab83c66080e2484fe5f1140ac2e0";
 const AUTH_SESSION_KEY = "hunthub_admin_authenticated_session_token_2026";
 
-// Rate limiting state
 let failedAttempts = 0;
 let lockoutTimer = null;
 
@@ -20,48 +16,63 @@ const DEFAULT_PRODUCTS = [
   {
     id: "prod-1",
     name: "Obsidian Apex",
-    tagline: "Titanium & Sapphire",
-    price: 14500,
-    currency: "€",
-    badge: "New Release",
+    brand: "Apple",
+    ram: "16GB",
+    tagline: "Titanium & Sapphire | 16GB RAM",
+    price: 145000,
+    currency: "₹",
+    badge: "Premium",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAd6YphimFNcYpZTImXq_Q0L_Js0Enj5QUGJk8qyxxZdPhdsC35zxg_dIQfUIUKEVcyaT9eIREb3l2cEhhx6iuXGedpdQ_o7PFaPtD5DdDx2w3eb5rfnGX90WuraBq_mWi9urRXqeQtfVybBiQlCd_tR-AtG6DJD4zqcbkgBJsLbaB_NRmKXj4-A2jxP1jcfLVGaj5vtkUHepoq9VmgfzcAES_ZrPB1ox9xG0FTYCnhKZrvwHYd0OiEBQ",
-    description: "Obsidian Apex: Minimalist luxury smartphone with matte black titanium finish and gold camera rims on marble plinth."
+    description: "Obsidian Apex: Minimalist luxury smartphone with matte black titanium finish and gold camera rims."
   },
   {
     id: "prod-2",
     name: "Aura Rose",
-    tagline: "18k Rose Gold",
-    price: 18200,
-    currency: "€",
-    badge: "Exclusive",
+    brand: "Samsung",
+    ram: "12GB",
+    tagline: "18k Rose Gold | 12GB RAM",
+    price: 182000,
+    currency: "₹",
+    badge: "Expensive",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAhwFw0HDGSe9-mFl_xhDFyBfPBmZRSwwL3AwYGITnqEAYGXe0NcomFnnAZUsq8NtVDZBeEkDUZqgogamRx4HlADM2C11vixKWOv0o2Q4rPgw7n7vAwTqU7mOa41J417FCP-ZCn8BEt1E_scSA7Shy4iL1xfLE4cGdY_SpZ3QY128TaVH8pqOjWRL1KjurQQ_9rSvPSo7MxIgqZ-UN0AfczDIaQhXhNTGv0H_ord6HoA1y5DCUDatYjjA",
     description: "Aura Rose: Polished rose gold mobile device with intricate carbon fiber back panel."
   },
   {
     id: "prod-3",
     name: "Silver Ghost",
-    tagline: "Aerospace Aluminum",
-    price: 11000,
-    currency: "€",
-    badge: "Limited Edition",
+    brand: "OnePlus",
+    ram: "8GB",
+    tagline: "Aerospace Aluminum | 8GB RAM",
+    price: 68000,
+    currency: "₹",
+    badge: "Mid range",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBfA1ZpMWg_eTW_NyZbhwHAof-azoul7Z81JiJcQ_hYp2T_BYvJM_AMZuPoCcbpM0eG-CxO-Cz5LVFWKCEtDcbDHxPqiXemjpf00FrKpbvtt6rEXEvrwimptThC5PiEU14_LOvc3ClRK4H4Yg9rO-RyC95iAmq4w0SPmNWIHyEkgrzMXQPJQjWR991nMojl4Q3OBHDP7QhxmtPO7Ndc4mR3rysv7eC7Uvn2OPDxJ-Njff_CDXl1p1Szhw",
     description: "Silver Ghost: Razor-thin aerospace aluminum chassis side profile shot."
   },
   {
     id: "prod-4",
     name: "Heritage Noir",
-    tagline: "Alligator & Platinum",
-    price: 22000,
-    currency: "€",
-    badge: "Masterpiece",
+    brand: "Apple",
+    ram: "16GB",
+    tagline: "Alligator & Platinum | 16GB RAM",
+    price: 240000,
+    currency: "₹",
+    badge: "Urgent sale",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCzp9Fz0L2fl_kNOpxnZaSTRMpOQyT34gxC41sBCAL9ILpeU8KW1db2Ov0IKjDSYXs6ioFPuGiUAFeoPWSXmNa-hNoFluhgF4ZzEXpgTrOinXevA4b0UpxqHOUd3WIZuBd2JdzMA6oDi4MD7Rx6QG_1Hf3AWEi9vLtPuCB2Al6OzL4Euvp7NXzA_awrISTgoDcoGPqPkfi51HTNNCriYX8YbZ_mQVXkW_Wn1RTNpwBcVjLaYrmVIozBYA",
     description: "Heritage Noir: Alligator leather clad back panel with platinum bezel details."
   }
 ];
 
-// App State
 let adminRequests = [];
 let adminProducts = [];
+let siteImagesState = {
+  logoUrl: "",
+  heroBgUrl: "",
+  sovereignImgUrl: "",
+  heritageImgUrl: "",
+  opticsImgUrl: "",
+  aegisImgUrl: ""
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   initAdminSecurityAuth();
@@ -71,10 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
   updateMetrics();
   initAddProductForm();
   initEditProductForm();
+  initSiteImagesControl();
 });
 
 /* ==========================================
-   0. SECURE AUTHENTICATION & ANTI-INJECTION GATEWAY
+   0. SECURE AUTHENTICATION GATEWAY
    ========================================== */
 function initAdminSecurityAuth() {
   const overlay = document.getElementById('admin-auth-overlay');
@@ -82,7 +94,6 @@ function initAdminSecurityAuth() {
   const togglePassBtn = document.getElementById('toggle-pass-visibility');
   const passInput = document.getElementById('auth-admin-pass');
 
-  // Check existing session authentication
   const sessionToken = sessionStorage.getItem(AUTH_SESSION_KEY);
   if (sessionToken === "AUTHENTICATED_HUNTHUB_ADMIN_SECURE_TOKEN") {
     if (overlay) overlay.style.display = 'none';
@@ -90,7 +101,6 @@ function initAdminSecurityAuth() {
     if (overlay) overlay.style.display = 'flex';
   }
 
-  // Password Visibility Toggle
   if (togglePassBtn && passInput) {
     togglePassBtn.addEventListener('click', () => {
       const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -100,7 +110,6 @@ function initAdminSecurityAuth() {
     });
   }
 
-  // Login Form Submission
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -113,20 +122,16 @@ function initAdminSecurityAuth() {
       const idInput = document.getElementById('auth-admin-id').value;
       const passInputVal = document.getElementById('auth-admin-pass').value;
 
-      // Anti-SQL & Script Injection Sanitizer
       const sanitizedId = sanitizeInput(idInput);
       const sanitizedPass = sanitizeInput(passInputVal);
 
-      // Cryptographic SHA-256 Hash Calculation
       const computedIdHash = await sha256(sanitizedId);
       const computedPassHash = await sha256(sanitizedPass);
 
-      // Strict Double Comparison (Plaintext & SHA-256 Hash)
       const isValidId = (sanitizedId === "hunthub@100animesh") && (computedIdHash === AUTH_ID_HASH);
       const isValidPass = (sanitizedPass === "animesh@2008") && (computedPassHash === AUTH_PASS_HASH);
 
       if (isValidId && isValidPass) {
-        // Success
         sessionStorage.setItem(AUTH_SESSION_KEY, "AUTHENTICATED_HUNTHUB_ADMIN_SECURE_TOKEN");
         failedAttempts = 0;
         
@@ -141,7 +146,6 @@ function initAdminSecurityAuth() {
 
         showToast("Access Granted", "Welcome to HuntHub Executive Admin Center!");
       } else {
-        // Failed attempt
         failedAttempts++;
         const remaining = 5 - failedAttempts;
 
@@ -155,24 +159,21 @@ function initAdminSecurityAuth() {
   }
 }
 
-// Anti-SQL & XSS Injection Sanitizer
 function sanitizeInput(str) {
   if (!str) return "";
   return str
     .trim()
-    .replace(/['";\-\-]/g, "") // Remove SQL quotes and comment operators
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remove script tags
+    .replace(/['";\-\-]/g, "")
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
     .replace(/union\s+select/gi, "")
     .replace(/or\s+1=1/gi, "");
 }
 
-// SHA-256 Helper using Web Crypto API
 async function sha256(message) {
   const msgUint8 = new TextEncoder().encode(message);
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 function showAuthError(msg) {
@@ -252,13 +253,15 @@ function updateMetrics() {
 function switchAdminTab(tabName) {
   const tabBtnRequests = document.getElementById('tab-requests-btn');
   const tabBtnProducts = document.getElementById('tab-products-btn');
+  const tabBtnSiteImages = document.getElementById('tab-siteimages-btn');
   const tabBtnWhatsapp = document.getElementById('tab-whatsapp-btn');
 
   const contentRequests = document.getElementById('tab-content-requests');
   const contentProducts = document.getElementById('tab-content-products');
+  const contentSiteImages = document.getElementById('tab-content-siteimages');
   const contentWhatsapp = document.getElementById('tab-content-whatsapp');
 
-  [tabBtnRequests, tabBtnProducts, tabBtnWhatsapp].forEach(btn => {
+  [tabBtnRequests, tabBtnProducts, tabBtnSiteImages, tabBtnWhatsapp].forEach(btn => {
     if (btn) {
       btn.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-transparent text-secondary hover:text-white transition-colors shrink-0 flex items-center gap-2";
     }
@@ -266,6 +269,7 @@ function switchAdminTab(tabName) {
 
   if (contentRequests) contentRequests.classList.add('hidden');
   if (contentProducts) contentProducts.classList.add('hidden');
+  if (contentSiteImages) contentSiteImages.classList.add('hidden');
   if (contentWhatsapp) contentWhatsapp.classList.add('hidden');
 
   if (tabName === 'requests') {
@@ -276,6 +280,9 @@ function switchAdminTab(tabName) {
     if (tabBtnProducts) tabBtnProducts.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-gold text-gold transition-colors shrink-0 flex items-center gap-2";
     if (contentProducts) contentProducts.classList.remove('hidden');
     renderAdminProducts();
+  } else if (tabName === 'siteimages') {
+    if (tabBtnSiteImages) tabBtnSiteImages.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-gold text-gold transition-colors shrink-0 flex items-center gap-2";
+    if (contentSiteImages) contentSiteImages.classList.remove('hidden');
   } else if (tabName === 'whatsapp') {
     if (tabBtnWhatsapp) tabBtnWhatsapp.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-gold text-gold transition-colors shrink-0 flex items-center gap-2";
     if (contentWhatsapp) contentWhatsapp.classList.remove('hidden');
@@ -332,6 +339,7 @@ function renderAdminRequests() {
           <div>
             <h3 class="font-display text-lg text-white font-bold">${req.model}</h3>
             <div class="flex flex-wrap gap-2 mt-1">
+              <span class="bg-dark-bg text-gold text-[10px] font-label px-2 py-0.5 border border-gold/30">${req.brand || 'Phone'}</span>
               <span class="bg-dark-bg text-secondary text-[10px] font-label px-2 py-0.5 border border-dark-border">${req.storage}</span>
               <span class="bg-dark-bg text-secondary text-[10px] font-label px-2 py-0.5 border border-dark-border">${req.condition}</span>
               <span class="bg-dark-bg text-secondary text-[10px] font-label px-2 py-0.5 border border-dark-border">Battery: ${req.batteryHealth}</span>
@@ -339,7 +347,7 @@ function renderAdminRequests() {
           </div>
         </div>
 
-        <!-- Owner & Price Details -->
+        <!-- Owner & Price Details in Rupees -->
         <div class="bg-dark-bg p-3.5 border border-dark-border/80 space-y-2 text-xs">
           <div class="flex justify-between">
             <span class="text-secondary font-label">Seller:</span>
@@ -347,7 +355,7 @@ function renderAdminRequests() {
           </div>
           <div class="flex justify-between border-t border-dark-border/50 pt-2">
             <span class="text-secondary font-label">User Expected Price:</span>
-            <span class="text-amber-400 font-bold">$${req.expectedPrice.toLocaleString()}</span>
+            <span class="text-amber-400 font-bold">₹${req.expectedPrice.toLocaleString('en-IN')}</span>
           </div>
         </div>
 
@@ -356,13 +364,13 @@ function renderAdminRequests() {
           "${req.description}"
         </p>
 
-        <!-- Admin Retail Price Input (Adding Profit Margin) -->
+        <!-- Admin Retail Price Input in Rupees (Adding Profit Margin) -->
         <div class="pt-2 border-t border-dark-border">
           <label class="font-label text-[11px] text-gold font-bold block mb-1">
-            Store Retail Price ($) - Add Profit Margin:
+            Store Retail Price (₹) - Add Profit Margin:
           </label>
           <div class="flex gap-2">
-            <span class="bg-dark-bg text-gold font-bold px-3 py-2 border border-dark-border flex items-center">$</span>
+            <span class="bg-dark-bg text-gold font-bold px-3 py-2 border border-dark-border flex items-center">₹</span>
             <input type="number" id="retail-price-${req.id}" value="${defaultRetailPrice}" 
                    class="w-full bg-dark-bg border border-dark-border px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-gold">
           </div>
@@ -397,10 +405,12 @@ function approveSellRequest(requestId) {
   const newProduct = {
     id: `prod-${Date.now()}`,
     name: req.model,
+    brand: req.brand || "Generic",
+    ram: "8GB",
     tagline: `${req.storage} | ${req.condition}`,
     price: finalPrice,
-    currency: "$",
-    badge: "Certified Pre-Owned",
+    currency: "₹",
+    badge: "Recent uploaded",
     image: req.images[0] || "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A",
     description: `Certified Pre-Owned ${req.model} (${req.storage}, ${req.condition}, Battery: ${req.batteryHealth}). Seller Notes: ${req.description}`
   };
@@ -408,7 +418,6 @@ function approveSellRequest(requestId) {
   adminProducts.unshift(newProduct);
   localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
 
-  // Remove request from pending list completely
   adminRequests = adminRequests.filter(r => r.id !== requestId);
   localStorage.setItem('hunthub_sell_requests', JSON.stringify(adminRequests));
 
@@ -420,7 +429,7 @@ function approveSellRequest(requestId) {
     setTimeout(() => {
       renderAdminRequests();
       renderAdminProducts();
-      showToast('Approved & Published', `${req.model} has been published to live store catalog for $${finalPrice}!`);
+      showToast('Approved & Published', `${req.model} published for ₹${finalPrice.toLocaleString('en-IN')}!`);
     }, 350);
   }
 }
@@ -428,7 +437,6 @@ function approveSellRequest(requestId) {
 function rejectSellRequest(requestId) {
   const req = adminRequests.find(r => r.id === requestId);
   
-  // Completely filter out rejected item from state and storage
   adminRequests = adminRequests.filter(r => r.id !== requestId);
   localStorage.setItem('hunthub_sell_requests', JSON.stringify(adminRequests));
 
@@ -447,7 +455,7 @@ function rejectSellRequest(requestId) {
 }
 
 /* ==========================================
-   4. STORE INVENTORY EDIT & DELETE MANAGEMENT
+   4. STORE INVENTORY EDIT & GALLERY FILE UPLOAD
    ========================================== */
 function renderAdminProducts() {
   const container = document.getElementById('admin-products-container');
@@ -474,14 +482,27 @@ function renderAdminProducts() {
     card.id = `product-card-${prod.id}`;
     card.className = "bg-dark-card border border-dark-border p-5 flex flex-col justify-between space-y-4 hover:border-gold/40 transition-all duration-300";
 
+    let badgeClass = "bg-dark-bg text-gold border border-gold/40";
+    if (prod.badge === "Expensive") badgeClass = "bg-amber-950/40 text-amber-400 border border-amber-800";
+    else if (prod.badge === "Recent uploaded") badgeClass = "bg-blue-950/40 text-blue-400 border border-blue-800";
+    else if (prod.badge === "Premium") badgeClass = "bg-purple-950/40 text-purple-400 border border-purple-800";
+    else if (prod.badge === "Mid range") badgeClass = "bg-emerald-950/40 text-emerald-400 border border-emerald-800";
+    else if (prod.badge === "Low range") badgeClass = "bg-yellow-950/40 text-yellow-400 border border-yellow-800";
+    else if (prod.badge === "Urgent sale") badgeClass = "bg-red-950/40 text-red-400 border border-red-800";
+
     card.innerHTML = `
       <div class="space-y-3">
         <!-- Image & Badge -->
         <div class="w-full h-44 bg-dark-bg border border-dark-border overflow-hidden relative">
           <img src="${prod.image}" class="w-full h-full object-cover object-center" alt="${prod.name}">
           ${prod.badge ? `
-            <div class="absolute top-3 left-3 bg-dark-bg/90 border border-gold/40 px-2 py-0.5">
-              <span class="font-label text-[9px] text-gold font-bold uppercase tracking-wider">${prod.badge}</span>
+            <div class="absolute top-3 left-3 z-10">
+              <span class="font-label text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 ${badgeClass}">${prod.badge}</span>
+            </div>
+          ` : ''}
+          ${prod.ram ? `
+            <div class="absolute top-3 right-3 bg-dark-bg/90 text-white font-label text-[9px] font-bold px-2 py-0.5 border border-dark-border">
+              ${prod.ram} RAM
             </div>
           ` : ''}
         </div>
@@ -490,7 +511,7 @@ function renderAdminProducts() {
         <div>
           <div class="flex justify-between items-start gap-2">
             <h3 class="font-display text-base text-white font-bold">${prod.name}</h3>
-            <span class="font-serif text-sm text-gold font-bold">${prod.currency || '$'}${Number(prod.price).toLocaleString()}</span>
+            <span class="font-serif text-base text-gold font-bold">₹${Number(prod.price).toLocaleString('en-IN')}</span>
           </div>
           <p class="font-label text-[10px] text-secondary uppercase tracking-wider">${prod.tagline || 'Custom Luxury Edition'}</p>
         </div>
@@ -519,7 +540,7 @@ function renderAdminProducts() {
   });
 }
 
-/* Edit Modal Logic */
+/* Edit Product Modal Logic with File Upload Picker */
 function openEditModal(productId) {
   const prod = adminProducts.find(p => p.id === productId);
   if (!prod) return;
@@ -530,8 +551,9 @@ function openEditModal(productId) {
   document.getElementById('edit-prod-id').value = prod.id;
   document.getElementById('edit-prod-title').value = prod.name;
   document.getElementById('edit-prod-price').value = prod.price;
+  document.getElementById('edit-prod-ram').value = prod.ram || '8GB';
   document.getElementById('edit-prod-tagline').value = prod.tagline || '';
-  document.getElementById('edit-prod-badge').value = prod.badge || '';
+  document.getElementById('edit-prod-badge').value = prod.badge || 'Premium';
   document.getElementById('edit-prod-image').value = prod.image;
   document.getElementById('edit-prod-desc').value = prod.description || '';
 
@@ -550,16 +572,21 @@ function closeEditModal() {
 
 function initEditProductForm() {
   const form = document.getElementById('admin-edit-form');
-  const imageInput = document.getElementById('edit-prod-image');
+  const fileInput = document.getElementById('edit-prod-file');
+  const hiddenImageInput = document.getElementById('edit-prod-image');
   const previewEl = document.getElementById('edit-prod-image-preview');
 
-  if (imageInput && previewEl) {
-    imageInput.addEventListener('input', (e) => {
-      const url = e.target.value.trim();
-      if (url) {
-        previewEl.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
-      } else {
-        previewEl.innerHTML = `<span class="text-xs text-secondary">Image Preview</span>`;
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          hiddenImageInput.value = dataUrl;
+          if (previewEl) previewEl.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover">`;
+        };
+        reader.readAsDataURL(file);
       }
     });
   }
@@ -571,9 +598,10 @@ function initEditProductForm() {
       const id = document.getElementById('edit-prod-id').value;
       const title = document.getElementById('edit-prod-title').value.trim();
       const price = Number(document.getElementById('edit-prod-price').value);
+      const ram = document.getElementById('edit-prod-ram').value;
       const tagline = document.getElementById('edit-prod-tagline').value.trim();
-      const badge = document.getElementById('edit-prod-badge').value.trim();
-      const image = document.getElementById('edit-prod-image').value.trim();
+      const badge = document.getElementById('edit-prod-badge').value;
+      const image = hiddenImageInput.value || "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A";
       const desc = document.getElementById('edit-prod-desc').value.trim();
 
       const index = adminProducts.findIndex(p => p.id === id);
@@ -582,6 +610,8 @@ function initEditProductForm() {
           ...adminProducts[index],
           name: title,
           price: price,
+          currency: "₹",
+          ram: ram,
           tagline: tagline,
           badge: badge,
           image: image,
@@ -591,7 +621,7 @@ function initEditProductForm() {
         localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
         closeEditModal();
         renderAdminProducts();
-        showToast('Changes Saved', `${title} details updated successfully.`);
+        showToast('Changes Saved', `${title} updated successfully.`);
       }
     });
   }
@@ -610,7 +640,7 @@ function deleteProduct(productId) {
   showToast('Item Deleted', 'Product has been removed from catalog.');
 }
 
-/* Add Custom Product Form Logic */
+/* Add Custom Product Form with Direct File Picker */
 function toggleAddProductForm() {
   const container = document.getElementById('admin-add-product-container');
   if (container) container.classList.toggle('hidden');
@@ -618,24 +648,45 @@ function toggleAddProductForm() {
 
 function initAddProductForm() {
   const form = document.getElementById('admin-add-product-form');
+  const fileInput = document.getElementById('add-prod-file');
+  const hiddenImageInput = document.getElementById('add-prod-image');
+  const previewEl = document.getElementById('add-prod-image-preview');
+
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          hiddenImageInput.value = dataUrl;
+          if (previewEl) previewEl.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const title = document.getElementById('add-prod-title').value.trim();
       const price = Number(document.getElementById('add-prod-price').value);
+      const ram = document.getElementById('add-prod-ram').value;
       const tagline = document.getElementById('add-prod-tagline').value.trim();
-      const badge = document.getElementById('add-prod-badge').value.trim();
-      const image = document.getElementById('add-prod-image').value.trim();
+      const badge = document.getElementById('add-prod-badge').value;
+      const image = hiddenImageInput.value || "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A";
       const desc = document.getElementById('add-prod-desc').value.trim();
 
       const newProd = {
         id: `prod-${Date.now()}`,
         name: title,
         price: price,
-        currency: "$",
+        currency: "₹",
+        ram: ram,
         tagline: tagline || "Custom Luxury Edition",
-        badge: badge || "New",
+        badge: badge || "Premium",
         image: image,
         description: desc || title
       };
@@ -644,10 +695,70 @@ function initAddProductForm() {
       localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
 
       form.reset();
+      hiddenImageInput.value = "";
+      if (previewEl) previewEl.innerHTML = `<span class="text-xs text-secondary">Image Preview</span>`;
       toggleAddProductForm();
       renderAdminProducts();
-      showToast('Item Added', `${title} is now published in store catalog!`);
+      showToast('Item Added', `${title} is now published in store catalog for ₹${price.toLocaleString('en-IN')}!`);
     });
+  }
+}
+
+/* ==========================================
+   5. GLOBAL SITE MEDIA CONTROL PANEL
+   ========================================== */
+function initSiteImagesControl() {
+  const form = document.getElementById('admin-site-images-form');
+  if (!form) return;
+
+  const existingImages = JSON.parse(localStorage.getItem('hunthub_site_images')) || {};
+  siteImagesState = { ...existingImages };
+
+  // Bind file readers for site images
+  bindImageFileReader('site-img-logo-file', 'logoUrl', 'prev-site-logo');
+  bindImageFileReader('site-img-herobg-file', 'heroBgUrl', 'prev-site-herobg');
+  bindImageFileReader('site-img-sovereign-file', 'sovereignImgUrl', 'prev-site-sovereign');
+  bindImageFileReader('site-img-heritage-file', 'heritageImgUrl', 'prev-site-heritage');
+  bindImageFileReader('site-img-optics-file', 'opticsImgUrl', 'prev-site-optics');
+  bindImageFileReader('site-img-aegis-file', 'aegisImgUrl', 'prev-site-aegis');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    localStorage.setItem('hunthub_site_images', JSON.stringify(siteImagesState));
+    showToast('Global Media Saved', 'Website static images updated successfully!');
+  });
+}
+
+function bindImageFileReader(fileInputId, stateKey, previewId) {
+  const input = document.getElementById(fileInputId);
+  const preview = document.getElementById(previewId);
+
+  // Set initial preview if exists in state
+  if (preview && siteImagesState[stateKey]) {
+    preview.innerHTML = `<img src="${siteImagesState[stateKey]}" class="w-full h-full object-contain">`;
+  }
+
+  if (input) {
+    input.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          siteImagesState[stateKey] = dataUrl;
+          if (preview) preview.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-contain">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+}
+
+function resetSiteImages() {
+  if (confirm("Reset all custom website images back to default theme visuals?")) {
+    localStorage.removeItem('hunthub_site_images');
+    siteImagesState = {};
+    location.reload();
   }
 }
 

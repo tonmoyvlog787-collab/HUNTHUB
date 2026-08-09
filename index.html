@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-  <title>HUNTHUB - Digital Craftsmanship & Luxury Mobile Marketplace</title>
+  <title>HUNTHUB ft. Animesh - Digital Craftsmanship & Luxury Mobile Marketplace</title>
   
   <!-- Tailwind CSS & Google Fonts -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -73,8 +73,9 @@
       </div>
 
       <!-- Brand Logo (Center / Left on mobile) -->
-      <a class="font-display font-bold text-xl sm:text-2xl md:text-3xl tracking-tighter text-primary hover:opacity-90 transition-opacity" href="#">
-        HUNTHUB
+      <a class="font-display font-bold text-lg sm:text-2xl md:text-3xl tracking-tighter text-primary hover:opacity-90 transition-opacity flex items-center gap-1.5" href="#">
+        <span id="site-logo-img-container" class="inline-block"></span>
+        <span>HUNTHUB <span class="text-accent text-sm sm:text-base font-normal font-label">ft. Animesh</span></span>
       </a>
 
       <!-- Right Actions / Utilities -->
@@ -105,7 +106,7 @@
     <button id="mobile-menu-close" class="absolute top-5 right-5 text-gold p-3 icon-btn">
       <span class="material-symbols-outlined text-3xl">close</span>
     </button>
-    <div class="font-display text-3xl text-gold mb-4 border-b border-gold/30 pb-2 w-full text-center">HUNTHUB</div>
+    <div class="font-display text-2xl sm:text-3xl text-gold mb-2 border-b border-gold/30 pb-2 w-full text-center">HUNTHUB ft. Animesh</div>
     <a class="font-label text-base tracking-widest hover:text-gold transition-colors py-2" href="#collections">Collections</a>
     <a class="font-label text-base tracking-widest hover:text-gold transition-colors py-2" href="#exclusive">Exclusive Edition</a>
     <a class="font-label text-base tracking-widest hover:text-gold transition-colors py-2" href="#sell-device">Sell Your Phone</a>
@@ -123,8 +124,8 @@
   <!-- ==================== HERO SECTION ==================== -->
   <header id="hero" class="relative min-h-[80vh] w-full flex flex-col items-center justify-center text-center px-4 sm:px-6 pt-8 pb-16 overflow-hidden bg-gradient-to-b from-surface via-surface to-surface-low border-b border-accent/10">
     
-    <!-- Background Ambient Glow -->
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[600px] h-[320px] sm:h-[600px] bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- Hero Image Banner Container (Managed via Admin Site Image Control) -->
+    <div id="site-hero-bg-container" class="absolute inset-0 z-0 pointer-events-none opacity-20 bg-cover bg-center"></div>
 
     <div class="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
       <div class="inline-block border border-accent/40 px-3 sm:px-4 py-1.5 font-label text-[10px] sm:text-[11px] text-accent tracking-[0.2em] uppercase mb-6 scroll-reveal">
@@ -132,11 +133,11 @@
       </div>
 
       <h1 class="font-display text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-primary font-bold tracking-tight leading-[1.15] mb-6 scroll-reveal delay-1">
-        Digital Craftsmanship
+        HUNTHUB <span class="text-accent italic font-normal font-display">ft. Animesh</span>
       </h1>
 
       <p class="font-body text-base sm:text-lg md:text-xl text-secondary max-w-2xl mb-8 leading-relaxed font-light scroll-reveal delay-2">
-        Forged from heritage. Engineered for tomorrow. Experience the pinnacle of mobile luxury by <strong class="text-primary font-semibold">HUNTHUB</strong>. Developed by <span class="text-accent font-semibold">ft.tonmoy</span>.
+        Forged from heritage. Engineered for tomorrow. Experience the pinnacle of mobile luxury by <strong class="text-primary font-semibold">HUNTHUB ft. Animesh</strong>. Buy directly via WhatsApp or sell your pre-owned phone safely.
       </p>
 
       <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-stretch sm:items-center scroll-reveal delay-3">
@@ -164,12 +165,39 @@
   <section id="collections" class="w-full max-w-[1240px] mx-auto px-4 sm:px-8 md:px-16 py-16 sm:py-24 border-b border-accent/10">
     
     <!-- Section Header -->
-    <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
+    <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
       <span class="font-label text-xs text-accent uppercase tracking-[0.2em] mb-3 block scroll-reveal">The Masterpieces</span>
       <h2 class="font-display text-2xl sm:text-4xl md:text-5xl text-primary font-bold mb-4 scroll-reveal delay-1">Curated Collections</h2>
       <p class="font-body text-secondary text-sm sm:text-base leading-relaxed scroll-reveal delay-2 font-light">
-        Explore our definitive range of digital craftsmanship. Filter by price range or buy instantly via WhatsApp (<strong class="text-primary">+91 7086869464</strong>).
+        Explore our definitive range of digital craftsmanship. Filter by category sections or price range in Rupees (<strong class="text-primary">₹</strong>).
       </p>
+    </div>
+
+    <!-- ==================== ITEM SECTIONS / CATEGORY FILTER TABS ==================== -->
+    <div class="mb-8 overflow-x-auto no-scrollbar pb-2 scroll-reveal">
+      <div class="flex justify-center items-center gap-2 sm:gap-3 min-w-max mx-auto px-2" id="category-filter-tabs">
+        <button onclick="applyCategoryFilter('all')" class="category-tab-btn active" data-category="all">
+          All Masterpieces
+        </button>
+        <button onclick="applyCategoryFilter('Expensive')" class="category-tab-btn" data-category="Expensive">
+          💎 Expensive
+        </button>
+        <button onclick="applyCategoryFilter('Recent uploaded')" class="category-tab-btn" data-category="Recent uploaded">
+          ✨ Recent Uploaded
+        </button>
+        <button onclick="applyCategoryFilter('Premium')" class="category-tab-btn" data-category="Premium">
+          👑 Premium
+        </button>
+        <button onclick="applyCategoryFilter('Mid range')" class="category-tab-btn" data-category="Mid range">
+          ⚖️ Mid Range
+        </button>
+        <button onclick="applyCategoryFilter('Low range')" class="category-tab-btn" data-category="Low range">
+          🏷️ Low Range
+        </button>
+        <button onclick="applyCategoryFilter('Urgent sale')" class="category-tab-btn" data-category="Urgent sale">
+          🔥 Urgent Sale
+        </button>
+      </div>
     </div>
 
     <!-- ==================== PRICE RANGE FILTER CONTROLS ==================== -->
@@ -177,31 +205,31 @@
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b border-accent/15 pb-3">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-gold">tune</span>
-          <span class="font-label text-xs text-primary font-bold uppercase tracking-wider">Filter Catalog by Price</span>
+          <span class="font-label text-xs text-primary font-bold uppercase tracking-wider">Filter by Price Range (₹)</span>
         </div>
         <div class="font-serif text-sm text-accent font-semibold">
-          Max Price: <span id="price-range-value" class="text-primary font-bold">$30,000</span>
+          Max Price: <span id="price-range-value" class="text-primary font-bold">₹1,50,000</span>
         </div>
       </div>
 
-      <!-- Range Slider -->
+      <!-- Dynamic Cap Range Slider -->
       <div class="space-y-4">
-        <input type="range" id="price-range-slider" min="1000" max="30000" step="500" value="30000"
+        <input type="range" id="price-range-slider" min="1000" max="300000" step="1000" value="300000"
                class="w-full h-2 bg-accent/20 rounded-lg appearance-none cursor-pointer accent-gold focus:outline-none">
 
-        <!-- Preset Quick Filter Buttons -->
+        <!-- Preset Quick Filter Buttons in Rupees -->
         <div class="flex flex-wrap gap-2 pt-2" id="price-filter-presets">
           <button onclick="applyPriceFilter('all')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-gold bg-gold text-primary tracking-wider transition-colors active" data-filter="all">
             All Prices
           </button>
-          <button onclick="applyPriceFilter('under12k')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="under12k">
-            Under $12,000
+          <button onclick="applyPriceFilter('under50k')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="under50k">
+            Under ₹50,000
           </button>
-          <button onclick="applyPriceFilter('12k-18k')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="12k-18k">
-            $12,000 - $18,000
+          <button onclick="applyPriceFilter('50k-150k')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="50k-150k">
+            ₹50,000 - ₹1,50,000
           </button>
-          <button onclick="applyPriceFilter('above18k')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="above18k">
-            Above $18,000
+          <button onclick="applyPriceFilter('above150k')" class="price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors" data-filter="above150k">
+            Above ₹1,50,000
           </button>
         </div>
       </div>
@@ -234,17 +262,17 @@
           </p>
 
           <div class="pt-4 flex flex-col sm:flex-row sm:items-center gap-4">
-            <button onclick="buyProductViaWhatsApp('The Sovereign Edition (Exclusive)', '$4,500')" 
+            <button onclick="buyProductViaWhatsApp('The Sovereign Edition (Exclusive)', '₹3,60,000')" 
                     class="bg-primary text-white font-label text-xs uppercase tracking-[0.18em] px-7 py-3.5 btn-classic hover:bg-gold hover:text-primary transition-colors flex items-center justify-center gap-2">
               <span class="material-symbols-outlined text-sm">chat</span> Acquire via WhatsApp
             </button>
-            <span class="font-display text-2xl text-accent font-semibold text-center sm:text-left">$4,500</span>
+            <span class="font-display text-2xl text-accent font-semibold text-center sm:text-left">₹3,60,000</span>
           </div>
         </div>
 
-        <!-- Featured Phone Image -->
+        <!-- Featured Phone Image (Managed via Admin Global Image Settings) -->
         <div class="md:col-span-7 relative h-[320px] sm:h-[450px] md:h-[550px] flex items-center justify-center photo-clickable scroll-reveal-right">
-          <img class="w-full h-full object-contain drop-shadow-2xl z-10" 
+          <img id="site-sovereign-img" class="w-full h-full object-contain drop-shadow-2xl z-10" 
                data-alt="The Sovereign Edition floating smartphone with polished titanium frame and gold accents."
                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbaohGuTaTNWdc2zVWq-b3jcfoqKVM0kWdDBnLoK-hyfDhooUxChdbxbmr6dq-JBMz3-fTkMimysN54f1RJguJ1XK2zjMwTtAxm_eAuo4v11zmczcF4vc8qpuTz5TMHPDjMyotI45nD1bAuuPszZcZ3a6kmfJSLbtYnVYdRd9Ogh95OiFk_5ATl6syDydvuxXCgSTtu-YozosZYRNIf0ojAuLsb8YdVsxrfI5dU3DR8kTddPFF4cVX2A"
                alt="The Sovereign Edition"/>
@@ -301,7 +329,7 @@
       <span class="font-label text-xs text-accent uppercase tracking-[0.2em] mb-3 block scroll-reveal">Pre-Owned Marketplace</span>
       <h2 class="font-display text-2xl sm:text-4xl md:text-5xl text-primary font-bold mb-3 scroll-reveal delay-1">Sell Your Smartphone</h2>
       <p class="font-body text-secondary text-sm sm:text-base leading-relaxed scroll-reveal delay-2 font-light">
-        Submit your pre-owned device for listing on HuntHub. Your submission goes to our **Admin Panel** for price approval before public publication.
+        Submit your pre-owned device for listing on HuntHub ft. Animesh. Your submission goes to our **Admin Panel** for price evaluation before public publication.
       </p>
     </div>
 
@@ -309,16 +337,22 @@
       
       <form id="sell-device-form" class="space-y-5">
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
-            <label class="font-label text-xs text-primary font-bold block mb-1.5">Phone Model Name *</label>
-            <input type="text" id="sell-model" required placeholder="e.g. iPhone 15 Pro Max / Galaxy S24 Ultra" 
+            <label class="font-label text-xs text-primary font-bold block mb-1.5">Company / Brand Name *</label>
+            <input type="text" id="sell-brand" required placeholder="e.g. Apple / Samsung / OnePlus" 
                    class="w-full bg-surface border border-accent/30 px-3.5 py-2.5 font-body text-sm focus:outline-none focus:border-gold">
           </div>
 
           <div>
-            <label class="font-label text-xs text-primary font-bold block mb-1.5">Expected Selling Price ($ / ₹) *</label>
-            <input type="number" id="sell-price" required placeholder="e.g. 950" 
+            <label class="font-label text-xs text-primary font-bold block mb-1.5">Phone Model Name *</label>
+            <input type="text" id="sell-model" required placeholder="e.g. iPhone 15 Pro Max" 
+                   class="w-full bg-surface border border-accent/30 px-3.5 py-2.5 font-body text-sm focus:outline-none focus:border-gold">
+          </div>
+
+          <div>
+            <label class="font-label text-xs text-primary font-bold block mb-1.5">Expected Price (₹) *</label>
+            <input type="number" id="sell-price" required placeholder="e.g. 75000" 
                    class="w-full bg-surface border border-accent/30 px-3.5 py-2.5 font-body text-sm focus:outline-none focus:border-gold">
           </div>
         </div>
@@ -341,8 +375,9 @@
           </div>
 
           <div>
-            <label class="font-label text-xs text-primary font-bold block mb-1.5">Storage Capacity</label>
+            <label class="font-label text-xs text-primary font-bold block mb-1.5">Storage Capacity *</label>
             <select id="sell-storage" class="w-full bg-surface border border-accent/30 px-3.5 py-2.5 font-body text-sm focus:outline-none focus:border-gold">
+              <option value="64GB">64GB</option>
               <option value="128GB">128GB</option>
               <option value="256GB" selected>256GB</option>
               <option value="512GB">512GB</option>
@@ -366,10 +401,12 @@
         </div>
 
         <div>
-          <label class="font-label text-xs text-primary font-bold block mb-1.5">Upload Device Photos</label>
+          <label class="font-label text-xs text-primary font-bold block mb-1.5">Upload Device Photos (Choose Files / Gallery)</label>
           <input type="file" id="sell-images" accept="image/*" multiple 
-                 class="w-full bg-surface border border-accent/30 p-2 font-body text-xs focus:outline-none focus:border-gold">
-          <div id="sell-images-preview" class="flex gap-3 mt-3 overflow-x-auto"></div>
+                 class="w-full bg-surface border border-accent/30 p-2 font-body text-xs focus:outline-none focus:border-gold cursor-pointer">
+          <div id="sell-images-preview" class="flex gap-3 mt-3 overflow-x-auto min-h-[5rem] items-center p-2 border border-dashed border-accent/20 bg-surface">
+            <span class="text-xs text-secondary italic">Selected photos will preview here.</span>
+          </div>
         </div>
 
         <div>
@@ -386,7 +423,7 @@
           </p>
         </div>
 
-        <button type="submit" class="btn-gold-shimmer w-full py-3.5 font-label text-xs uppercase tracking-[0.18em] font-bold btn-classic">
+        <button type="submit" id="sell-submit-btn" class="btn-gold-shimmer w-full py-3.5 font-label text-xs uppercase tracking-[0.18em] font-bold btn-classic">
           Submit Device for Admin Review
         </button>
 
@@ -418,7 +455,7 @@
           </p>
         </div>
         <div class="md:w-1/2 relative min-h-[250px] sm:min-h-[300px] photo-clickable">
-          <img class="w-full h-full object-cover" 
+          <img id="site-heritage-img" class="w-full h-full object-cover" 
                data-alt="Forged in Elegance: Sleek smartphone resting on dark slate surface with soft studio lighting."
                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwhbuMNxGpkI7fvcUwUe1Waku-xehUqXIlsr6DpIf8cHnm42vKMYmG-MoIFXVzzYAThlF9kQH9yZGN3BFlMVLZDj4IGw3l4w_h-b-S73DE_iseMj5sDy6uqlKyt32QIiFeR1gma3Qv76fHnhAegN4Px3TsPuU2_Sbi2T-vP-0zKrtV7yiL4OlANPzD0UfgmSkJk2tNaTpbqQ5PsaUx0MYIF40CPp9Cf4DQJoBWoqsoa1PxEGqCZ-1Ugg"
                alt="Forged in Elegance"/>
@@ -431,7 +468,7 @@
         <!-- Feature 1 -->
         <div class="bg-surface-low border border-accent/20 p-6 sm:p-10 flex flex-col justify-between scroll-reveal-left">
           <div class="h-48 sm:h-64 w-full relative mb-4 photo-clickable">
-            <img class="w-full h-full object-cover" 
+            <img id="site-optics-img" class="w-full h-full object-cover" 
                  data-alt="Optical Purity: Leica-engineered camera lens ring in brushed gold."
                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdvuYbH6ZAN-6_ft7CuRdnyOQWqxtCd6wpFGxRJtmja4hls4cVdyddVgl2oJl1KFbpY4-54SBhaPej0pPCcpxzpPzCeecSpUYz2h4WRFqLSCndwEL6hInn_7IUi_TSHnZezzKioEpCGFEBnHjhLS32-cK8dRUpOBPxDlBhey16kPk85gWO25HfLYRlSShQTwkAKy5SBqb7b3cS2OxZoa3xQCtckorj6jbxG1ZGcNCRqXX1qLTkDiKV2g"
                  alt="Optical Purity"/>
@@ -445,7 +482,7 @@
         <!-- Feature 2 -->
         <div class="bg-primary text-white border border-accent/20 p-6 sm:p-10 flex flex-col justify-between scroll-reveal-right">
           <div class="h-48 sm:h-64 w-full relative mb-4 photo-clickable opacity-90">
-            <img class="w-full h-full object-cover" 
+            <img id="site-aegis-img" class="w-full h-full object-cover" 
                  data-alt="Aegis Security: Glowing gold encryption pattern representing digital safety."
                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw3QSP4jj5p4_MT4Zt5JjonworegJ1NsupB5TUnNxbnybmtWm9tYCTGDzo6cS1mttYob6-xwx-onKqeL9kxNJwZnB7vmr9Zaolw2h1tAto7wi_GdRS8orn3etEfLeATgfSRjmHpm7fm7dW_FmLY_NLgU-BNLk0ZA6W7w5me5XLAOvAGSmpZNaTs7X1SQgquG8YnJVqrmRlEH4YXn6saMgx2rH01Mz7JpLKi5OBNE98Er2qZn-_ucVvew"
                  alt="Aegis Security"/>
@@ -504,7 +541,7 @@
             <div>
               <div class="flex justify-between items-start gap-4 mb-2">
                 <h3 class="font-display text-lg sm:text-xl font-bold text-primary">HuntHub Series X – Obsidian Edition</h3>
-                <span class="font-serif text-base sm:text-lg text-accent font-semibold">$4,250</span>
+                <span class="font-serif text-base sm:text-lg text-accent font-semibold">₹3,40,000</span>
               </div>
               <p class="font-body text-xs sm:text-sm text-secondary leading-relaxed">
                 Forged from aerospace-grade titanium with an exclusive matte finish. Includes personalized engraving.
@@ -514,7 +551,7 @@
               <div class="mt-4 flex flex-col gap-1.5">
                 <div class="flex items-center gap-2.5">
                   <div class="w-2 h-2 rounded-full bg-primary shrink-0"></div>
-                  <span class="font-label text-[10px] sm:text-[11px] text-primary">1TB Solid State Storage</span>
+                  <span class="font-label text-[10px] sm:text-[11px] text-primary">1TB Solid State Storage | 16GB RAM</span>
                 </div>
                 <div class="flex items-center gap-2.5">
                   <div class="w-2 h-2 rounded-full bg-gold shrink-0"></div>
@@ -556,7 +593,7 @@
           <div class="flex flex-col gap-2.5 font-body text-xs sm:text-sm">
             <div class="flex justify-between items-center text-secondary">
               <span>Subtotal</span>
-              <span id="subtotal-display" class="text-primary font-semibold">$4,250.00</span>
+              <span id="subtotal-display" class="text-primary font-semibold">₹3,40,000.00</span>
             </div>
             <div class="flex justify-between items-center text-secondary">
               <span>Exclusive Options</span>
@@ -572,9 +609,9 @@
 
           <div class="flex justify-between items-center font-display text-lg sm:text-xl text-primary font-bold">
             <span>Total</span>
-            <span id="total-display" class="text-accent">$4,250.00</span>
+            <span id="total-display" class="text-accent">₹3,40,000.00</span>
           </div>
-          <p class="font-label text-[9px] text-secondary text-right -mt-3">Excluding local taxes</p>
+          <p class="font-label text-[9px] text-secondary text-right -mt-3">Excluding local GST</p>
 
           <button id="checkout-btn" class="btn-whatsapp w-full py-4 font-label text-xs uppercase tracking-[0.18em] font-bold flex items-center justify-center gap-2 btn-classic">
             <span class="material-symbols-outlined text-[18px]">chat</span>
@@ -675,7 +712,7 @@
       
       <div class="flex flex-col md:flex-row justify-between items-start gap-10">
         <div class="flex flex-col gap-3 max-w-md">
-          <span class="font-display font-bold text-2xl sm:text-3xl text-primary tracking-tighter">HUNTHUB</span>
+          <span class="font-display font-bold text-2xl sm:text-3xl text-primary tracking-tighter">HUNTHUB ft. Animesh</span>
           <p class="font-body text-xs sm:text-sm text-secondary leading-relaxed font-light">
             Elevating the standard of digital interaction through uncompromising craftsmanship and timeless design. Developed by <span class="text-primary font-semibold">ft.tonmoy</span>.
           </p>
@@ -702,7 +739,7 @@
 
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-accent/15 text-center sm:text-left">
         <p class="font-label text-[10px] sm:text-[11px] tracking-widest text-secondary uppercase">
-          © 2026 HUNTHUB DIGITAL CRAFTSMANSHIP. DEVELOPED BY FT.TONMOY. ALL RIGHTS RESERVED.
+          © 2026 HUNTHUB FT. ANIMESH DIGITAL CRAFTSMANSHIP. DEVELOPED BY FT.TONMOY. ALL RIGHTS RESERVED.
         </p>
         <div class="flex gap-4 justify-center">
           <a class="text-secondary hover:text-gold transition-colors" href="https://wa.me/917086869464" target="_blank" title="WhatsApp Concierge"><span class="material-symbols-outlined text-[20px]">chat</span></a>
