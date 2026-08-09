@@ -1,88 +1,25 @@
 /**
  * HUNTHUB ft. Animesh - Digital Craftsmanship Interactive Application
  * Features: Header Branding ("HUNTHUB ft. Animesh"), Rupee Currency Formatting (₹),
- * Dynamic Price Filter Cap, Category Filter Tabs (Expensive, Recent uploaded, Premium, Mid range, Low range, Urgent sale),
- * Robust File Upload for Phone Sellers, Cart & Selection Recalculation, Auto Photo Changer Gallery.
+ * Dynamic Price Filter (₹1 to Max Limit), Real-time Admin Section Category Sync,
+ * Clean Store Inventory (No Demo Items), Auto Photo Changer Gallery.
  */
 
 const WHATSAPP_NUMBER = "917086869464";
 
-// Initial Catalog Store Items in Rupees (₹) with Explicit Categories & Badges
-const DEFAULT_PRODUCTS = [
-  {
-    id: "prod-1",
-    name: "Obsidian Apex",
-    brand: "Apple",
-    ram: "16GB",
-    tagline: "Titanium & Sapphire | 16GB RAM",
-    price: 145000,
-    currency: "₹",
-    badge: "Premium",
-    category: "Premium",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAd6YphimFNcYpZTImXq_Q0L_Js0Enj5QUGJk8qyxxZdPhdsC35zxg_dIQfUIUKEVcyaT9eIREb3l2cEhhx6iuXGedpdQ_o7PFaPtD5DdDx2w3eb5rfnGX90WuraBq_mWi9urRXqeQtfVybBiQlCd_tR-AtG6DJD4zqcbkgBJsLbaB_NRmKXj4-A2jxP1jcfLVGaj5vtkUHepoq9VmgfzcAES_ZrPB1ox9xG0FTYCnhKZrvwHYd0OiEBQ",
-    description: "Obsidian Apex: Minimalist luxury smartphone with matte black titanium finish and gold camera rims."
-  },
-  {
-    id: "prod-2",
-    name: "Aura Rose",
-    brand: "Samsung",
-    ram: "12GB",
-    tagline: "18k Rose Gold | 12GB RAM",
-    price: 182000,
-    currency: "₹",
-    badge: "Expensive",
-    category: "Expensive",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAhwFw0HDGSe9-mFl_xhDFyBfPBmZRSwwL3AwYGITnqEAYGXe0NcomFnnAZUsq8NtVDZBeEkDUZqgogamRx4HlADM2C11vixKWOv0o2Q4rPgw7n7vAwTqU7mOa41J417FCP-ZCn8BEt1E_scSA7Shy4iL1xfLE4cGdY_SpZ3QY128TaVH8pqOjWRL1KjurQQ_9rSvPSo7MxIgqZ-UN0AfczDIaQhXhNTGv0H_ord6HoA1y5DCUDatYjjA",
-    description: "Aura Rose: Polished rose gold mobile device with intricate carbon fiber back panel."
-  },
-  {
-    id: "prod-3",
-    name: "Silver Ghost",
-    brand: "OnePlus",
-    ram: "8GB",
-    tagline: "Aerospace Aluminum | 8GB RAM",
-    price: 68000,
-    currency: "₹",
-    badge: "Mid range",
-    category: "Mid range",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBfA1ZpMWg_eTW_NyZbhwHAof-azoul7Z81JiJcQ_hYp2T_BYvJM_AMZuPoCcbpM0eG-CxO-Cz5LVFWKCEtDcbDHxPqiXemjpf00FrKpbvtt6rEXEvrwimptThC5PiEU14_LOvc3ClRK4H4Yg9rO-RyC95iAmq4w0SPmNWIHyEkgrzMXJQjWR991nMojl4Q3OBHDP7QhxmtPO7Ndc4mR3rysv7eC7Uvn2OPDxJ-Njff_CDXl1p1Szhw",
-    description: "Silver Ghost: Razor-thin aerospace aluminum chassis side profile shot."
-  },
-  {
-    id: "prod-4",
-    name: "Heritage Noir",
-    brand: "Apple",
-    ram: "16GB",
-    tagline: "Alligator & Platinum | 16GB RAM",
-    price: 240000,
-    currency: "₹",
-    badge: "Urgent sale",
-    category: "Urgent sale",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCzp9Fz0L2fl_kNOpxnZaSTRMpOQyT34gxC41sBCAL9ILpeU8KW1db2Ov0IKjDSYXs6ioFPuGiUAFeoPWSXmNa-hNoFluhgF4ZzEXpgTrOinXevA4b0UpxqHOUd3WIZuBd2JdzMA6oDi4MD7Rx6QG_1Hf3AWEi9vLtPuCB2Al6OzL4Euvp7NXzA_awrISTgoDcoGPqPkfi51HTNNCriYX8YbZ_mQVXkW_Wn1RTNpwBcVjLaYrmVIozBYA",
-    description: "Heritage Noir: Alligator leather clad back panel with platinum bezel details."
-  },
-  {
-    id: "prod-5",
-    name: "Lite Prestige",
-    brand: "Xiaomi",
-    ram: "6GB",
-    tagline: "Ultra Thin Metallic | 6GB RAM",
-    price: 32000,
-    currency: "₹",
-    badge: "Low range",
-    category: "Low range",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A",
-    description: "Lite Prestige: Slim entry-level luxury phone."
-  }
-];
+// Initial Catalog Store Items: Empty by default (Demo items removed)
+const DEFAULT_PRODUCTS = [];
 
 // App State
 let storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
 let sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
 let activeCategory = "all";
-let activeMaxPrice = 300000;
+let activeMaxPrice = 500000;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // If localStorage contains demo products (Obsidian Apex, etc.), filter them out
+  cleanupDemoProducts();
+
   initLoadingScreen();
   loadSiteImages();
   renderStoreProducts();
@@ -95,11 +32,41 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initSellDeviceForm();
 
+  // Instant real-time update when Admin Panel makes changes
   window.addEventListener('storage', (e) => {
     if (e.key === 'hunthub_site_images') loadSiteImages();
-    if (e.key === 'hunthub_products') renderStoreProducts();
+    if (e.key === 'hunthub_products') {
+      storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || [];
+      initPriceFilter();
+      renderStoreProducts();
+    }
   });
+
+  // Short interval polling for instant single-page sync
+  setInterval(() => {
+    const latestProds = JSON.parse(localStorage.getItem('hunthub_products')) || [];
+    if (JSON.stringify(latestProds) !== JSON.stringify(storeProducts)) {
+      storeProducts = latestProds;
+      initPriceFilter();
+      renderStoreProducts();
+    }
+  }, 1000);
 });
+
+/* Remove old demo items if they exist in localStorage */
+function cleanupDemoProducts() {
+  let stored = JSON.parse(localStorage.getItem('hunthub_products'));
+  if (Array.isArray(stored) && stored.length > 0) {
+    const demoIds = ["prod-1", "prod-2", "prod-3", "prod-4", "prod-5"];
+    const demoNames = ["Obsidian Apex", "Aura Rose", "Silver Ghost", "Heritage Noir", "Lite Prestige"];
+    
+    const cleaned = stored.filter(p => !demoIds.includes(p.id) && !demoNames.includes(p.name));
+    if (cleaned.length !== stored.length) {
+      localStorage.setItem('hunthub_products', JSON.stringify(cleaned));
+      storeProducts = cleaned;
+    }
+  }
+}
 
 /* ==========================================
    0. STARTING LOADING INTRO SCREEN
@@ -164,11 +131,11 @@ function renderStoreProducts(filterPredicate = null) {
   const container = document.getElementById('products-grid-container');
   if (!container) return;
 
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
+  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || [];
   
   let filteredList = storeProducts;
 
-  // Apply Section Category Filter (Case-insensitive & space-tolerant)
+  // Apply Section Category Filter
   if (activeCategory !== "all") {
     filteredList = filteredList.filter(p => {
       const b = (p.badge || '').toLowerCase().trim();
@@ -178,7 +145,10 @@ function renderStoreProducts(filterPredicate = null) {
     });
   }
 
-  // Apply Price Filter Predicate
+  // Apply Price Range Filter (Everything from ₹1 up to activeMaxPrice)
+  filteredList = filteredList.filter(p => Number(p.price) <= activeMaxPrice);
+
+  // Apply Extra Filter Predicate if provided
   if (typeof filterPredicate === 'function') {
     filteredList = filteredList.filter(filterPredicate);
   }
@@ -188,11 +158,13 @@ function renderStoreProducts(filterPredicate = null) {
   if (filteredList.length === 0) {
     container.innerHTML = `
       <div class="col-span-full p-12 text-center border border-dashed border-primary/20 bg-surface-low">
-        <span class="material-symbols-outlined text-4xl text-accent mb-2 block">filter_alt_off</span>
-        <h3 class="font-display text-xl text-primary font-bold">No Products Found in ${activeCategory === 'all' ? 'Store' : activeCategory} Section</h3>
-        <p class="font-body text-xs text-secondary mt-1">No items match your selected section tag or price filter range.</p>
+        <span class="material-symbols-outlined text-4xl text-accent mb-2 block">inventory_2</span>
+        <h3 class="font-display text-xl text-primary font-bold">No Items in ${activeCategory === 'all' ? 'Store' : '"' + activeCategory + '"'} Section</h3>
+        <p class="font-body text-xs text-secondary mt-1">
+          ${storeProducts.length === 0 ? 'No phones uploaded yet. Upload phones from the Admin Panel to populate this section.' : 'No phones found in this price range (Rs 1 up to Rs ' + activeMaxPrice.toLocaleString('en-IN') + ').'}
+        </p>
         <button onclick="applyPriceFilter('all'); applyCategoryFilter('all');" class="mt-4 px-5 py-2 text-xs font-label uppercase font-bold text-gold border border-gold hover:bg-gold hover:text-primary transition-colors">
-          Show All Masterpieces
+          Show All Items
         </button>
       </div>
     `;
@@ -204,7 +176,7 @@ function renderStoreProducts(filterPredicate = null) {
     const article = document.createElement('article');
     article.className = `group flex flex-col gap-5 scroll-reveal ${isEven ? 'md:mt-12' : ''}`;
     
-    const displayBadge = prod.badge || prod.category || "Premium";
+    const displayBadge = prod.badge || prod.category || "Recent uploaded";
 
     let badgeClass = "border border-primary/20 bg-surface/80 text-primary";
     if (displayBadge === "Expensive") badgeClass = "badge-tag-expensive";
@@ -254,33 +226,39 @@ function renderStoreProducts(filterPredicate = null) {
   }
 }
 
-/* Price Range Filter Logic (Fixes Cap to Highest Available Catalog Price) */
+/* ==========================================
+   PRICE RANGE FILTER LOGIC (Shows Rs 1 up to Selected Limit)
+   ========================================== */
 function initPriceFilter() {
   const slider = document.getElementById('price-range-slider');
   const priceValEl = document.getElementById('price-range-value');
 
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
+  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || [];
   
-  const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 50000);
+  // Calculate highest price in catalog, default to 3,00,000 if catalog is empty
+  const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 300000);
 
   if (slider && priceValEl) {
-    slider.max = maxPriceInDataset;
-    slider.value = maxPriceInDataset;
-    activeMaxPrice = maxPriceInDataset;
-    priceValEl.textContent = `₹${maxPriceInDataset.toLocaleString('en-IN')}`;
+    slider.min = 1000;
+    slider.max = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
+    slider.value = slider.max;
+    activeMaxPrice = Number(slider.value);
 
-    slider.addEventListener('input', (e) => {
-      const val = Number(e.target.value);
-      activeMaxPrice = val;
-      priceValEl.textContent = `₹${val.toLocaleString('en-IN')}`;
+    priceValEl.textContent = `Rs 1 to Rs ${Number(slider.value).toLocaleString('en-IN')}`;
 
+    slider.oninput = (e) => {
+      const selectedLimit = Number(e.target.value);
+      activeMaxPrice = selectedLimit;
+      priceValEl.textContent = `Rs 1 to Rs ${selectedLimit.toLocaleString('en-IN')}`;
+
+      // Reset preset button highlight
       document.querySelectorAll('.price-filter-btn').forEach(btn => {
         btn.classList.remove('bg-gold', 'text-primary', 'border-gold');
         btn.classList.add('border-accent/30', 'text-secondary');
       });
 
-      renderStoreProducts(item => Number(item.price) <= activeMaxPrice);
-    });
+      renderStoreProducts();
+    };
   }
 }
 
@@ -296,28 +274,28 @@ function applyPriceFilter(presetType) {
     }
   });
 
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
-  const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 50000);
+  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || [];
+  const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 300000);
 
   if (presetType === 'all') {
-    if (slider) { slider.max = maxPriceInDataset; slider.value = maxPriceInDataset; }
-    if (priceValEl) priceValEl.textContent = `₹${maxPriceInDataset.toLocaleString('en-IN')}`;
-    renderStoreProducts();
+    activeMaxPrice = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
+    if (slider) { slider.max = activeMaxPrice; slider.value = activeMaxPrice; }
+    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs ${activeMaxPrice.toLocaleString('en-IN')}`;
   } else if (presetType === 'under50k') {
-    const targetVal = Math.min(50000, maxPriceInDataset);
-    if (slider) slider.value = targetVal;
-    if (priceValEl) priceValEl.textContent = `₹${targetVal.toLocaleString('en-IN')}`;
-    renderStoreProducts(item => Number(item.price) < 50000);
+    activeMaxPrice = 50000;
+    if (slider) slider.value = 50000;
+    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs 50,000`;
   } else if (presetType === '50k-150k') {
-    const targetVal = Math.min(150000, maxPriceInDataset);
-    if (slider) slider.value = targetVal;
-    if (priceValEl) priceValEl.textContent = `₹50,000 - ₹1,50,000`;
-    renderStoreProducts(item => Number(item.price) >= 50000 && Number(item.price) <= 150000);
+    activeMaxPrice = 150000;
+    if (slider) slider.value = 150000;
+    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs 1,50,000`;
   } else if (presetType === 'above150k') {
-    if (slider) slider.value = maxPriceInDataset;
-    if (priceValEl) priceValEl.textContent = `Above ₹1,50,000`;
-    renderStoreProducts(item => Number(item.price) > 150000);
+    activeMaxPrice = maxPriceInDataset > 150000 ? maxPriceInDataset : 300000;
+    if (slider) slider.value = activeMaxPrice;
+    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs ${activeMaxPrice.toLocaleString('en-IN')}`;
   }
+
+  renderStoreProducts();
 }
 
 function applyCategoryFilter(categoryName) {
@@ -331,10 +309,10 @@ function applyCategoryFilter(categoryName) {
     }
   });
 
-  renderStoreProducts(item => Number(item.price) <= activeMaxPrice);
+  renderStoreProducts();
   
   if (categoryName !== 'all') {
-    showToast('Section Filter Active', `Displaying only "${categoryName}" items.`);
+    showToast('Section Active', `Displaying "${categoryName}" section items.`);
   }
 }
 

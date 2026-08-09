@@ -12,60 +12,8 @@ const AUTH_SESSION_KEY = "hunthub_admin_authenticated_session_token_2026";
 let failedAttempts = 0;
 let lockoutTimer = null;
 
-const DEFAULT_PRODUCTS = [
-  {
-    id: "prod-1",
-    name: "Obsidian Apex",
-    brand: "Apple",
-    ram: "16GB",
-    tagline: "Titanium & Sapphire | 16GB RAM",
-    price: 145000,
-    currency: "₹",
-    badge: "Premium",
-    category: "Premium",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAd6YphimFNcYpZTImXq_Q0L_Js0Enj5QUGJk8qyxxZdPhdsC35zxg_dIQfUIUKEVcyaT9eIREb3l2cEhhx6iuXGedpdQ_o7PFaPtD5DdDx2w3eb5rfnGX90WuraBq_mWi9urRXqeQtfVybBiQlCd_tR-AtG6DJD4zqcbkgBJsLbaB_NRmKXj4-A2jxP1jcfLVGaj5vtkUHepoq9VmgfzcAES_ZrPB1ox9xG0FTYCnhKZrvwHYd0OiEBQ",
-    description: "Obsidian Apex: Minimalist luxury smartphone with matte black titanium finish and gold camera rims."
-  },
-  {
-    id: "prod-2",
-    name: "Aura Rose",
-    brand: "Samsung",
-    ram: "12GB",
-    tagline: "18k Rose Gold | 12GB RAM",
-    price: 182000,
-    currency: "₹",
-    badge: "Expensive",
-    category: "Expensive",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAhwFw0HDGSe9-mFl_xhDFyBfPBmZRSwwL3AwYGITnqEAYGXe0NcomFnnAZUsq8NtVDZBeEkDUZqgogamRx4HlADM2C11vixKWOv0o2Q4rPgw7n7vAwTqU7mOa41J417FCP-ZCn8BEt1E_scSA7Shy4iL1xfLE4cGdY_SpZ3QY128TaVH8pqOjWRL1KjurQQ_9rSvPSo7MxIgqZ-UN0AfczDIaQhXhNTGv0H_ord6HoA1y5DCUDatYjjA",
-    description: "Aura Rose: Polished rose gold mobile device with intricate carbon fiber back panel."
-  },
-  {
-    id: "prod-3",
-    name: "Silver Ghost",
-    brand: "OnePlus",
-    ram: "8GB",
-    tagline: "Aerospace Aluminum | 8GB RAM",
-    price: 68000,
-    currency: "₹",
-    badge: "Mid range",
-    category: "Mid range",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBfA1ZpMWg_eTW_NyZbhwHAof-azoul7Z81JiJcQ_hYp2T_BYvJM_AMZuPoCcbpM0eG-CxO-Cz5LVFWKCEtDcbDHxPqiXemjpf00FrKpbvtt6rEXEvrwimptThC5PiEU14_LOvc3ClRK4H4Yg9rO-RyC95iAmq4w0SPmNWIHyEkgrzMXJQjWR991nMojl4Q3OBHDP7QhxmtPO7Ndc4mR3rysv7eC7Uvn2OPDxJ-Njff_CDXl1p1Szhw",
-    description: "Silver Ghost: Razor-thin aerospace aluminum chassis side profile shot."
-  },
-  {
-    id: "prod-4",
-    name: "Heritage Noir",
-    brand: "Apple",
-    ram: "16GB",
-    tagline: "Alligator & Platinum | 16GB RAM",
-    price: 240000,
-    currency: "₹",
-    badge: "Urgent sale",
-    category: "Urgent sale",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCzp9Fz0L2fl_kNOpxnZaSTRMpOQyT34gxC41sBCAL9ILpeU8KW1db2Ov0IKjDSYXs6ioFPuGiUAFeoPWSXmNa-hNoFluhgF4ZzEXpgTrOinXevA4b0UpxqHOUd3WIZuBd2JdzMA6oDi4MD7Rx6QG_1Hf3AWEi9vLtPuCB2Al6OzL4Euvp7NXzA_awrISTgoDcoGPqPkfi51HTNNCriYX8YbZ_mQVXkW_Wn1RTNpwBcVjLaYrmVIozBYA",
-    description: "Heritage Noir: Alligator leather clad back panel with platinum bezel details."
-  }
-];
+// Default catalog: Empty (No demo sell items)
+const DEFAULT_PRODUCTS = [];
 
 let adminRequests = [];
 let adminProducts = [];
@@ -79,6 +27,7 @@ let siteImagesState = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  cleanupDemoProductsInAdmin();
   initAdminSecurityAuth();
   loadAdminState();
   renderAdminRequests();
@@ -88,6 +37,21 @@ document.addEventListener('DOMContentLoaded', () => {
   initEditProductForm();
   initSiteImagesControl();
 });
+
+/* Purge legacy demo items from localStorage */
+function cleanupDemoProductsInAdmin() {
+  let stored = JSON.parse(localStorage.getItem('hunthub_products'));
+  if (Array.isArray(stored) && stored.length > 0) {
+    const demoIds = ["prod-1", "prod-2", "prod-3", "prod-4", "prod-5"];
+    const demoNames = ["Obsidian Apex", "Aura Rose", "Silver Ghost", "Heritage Noir", "Lite Prestige"];
+    
+    const cleaned = stored.filter(p => !demoIds.includes(p.id) && !demoNames.includes(p.name));
+    if (cleaned.length !== stored.length) {
+      localStorage.setItem('hunthub_products', JSON.stringify(cleaned));
+      adminProducts = cleaned;
+    }
+  }
+}
 
 /* ==========================================
    0. SECURE AUTHENTICATION GATEWAY
@@ -231,10 +195,6 @@ function logoutAdmin() {
 function loadAdminState() {
   adminRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
   adminProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
-
-  if (!localStorage.getItem('hunthub_products')) {
-    localStorage.setItem('hunthub_products', JSON.stringify(DEFAULT_PRODUCTS));
-  }
 }
 
 function updateMetrics() {
@@ -492,8 +452,8 @@ function renderAdminProducts() {
     container.innerHTML = `
       <div class="col-span-full p-12 text-center border border-dashed border-dark-border bg-dark-card">
         <span class="material-symbols-outlined text-4xl text-gold mb-2 block">inventory_2</span>
-        <h3 class="font-display text-xl text-white font-bold">No Products in Catalog</h3>
-        <p class="font-body text-xs text-secondary mt-1">Click "Add Custom Item" to populate your store inventory.</p>
+        <h3 class="font-display text-xl text-white font-bold">No Published Items in Store</h3>
+        <p class="font-body text-xs text-secondary mt-1">Click "Add Custom Item" above or approve pending user submissions to populate your catalog.</p>
       </div>
     `;
     return;
