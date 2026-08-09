@@ -1,11 +1,8 @@
 /**
  * HUNTHUB - Dedicated Admin Control Center JavaScript
- * Handles: Rejection Removal, Edit Product Modal (Photos, Titles, Descriptions, Prices), Store Inventory & WhatsApp Orders
+ * Features: Pending Requests Review, Profit Margin Setting, Approval to Catalog, Instant Rejection Removal, Published Inventory Editing Modal & Deletion.
  */
 
-const WHATSAPP_NUMBER = "917086869464";
-
-// Default Store Products
 const DEFAULT_PRODUCTS = [
   {
     id: "prod-1",
@@ -49,364 +46,340 @@ const DEFAULT_PRODUCTS = [
   }
 ];
 
-// Default Pending Requests
-const DEFAULT_SELL_REQUESTS = [
-  {
-    id: "req-101",
-    model: "iPhone 15 Pro Max",
-    expectedPrice: 1100,
-    condition: "Mint (Flawless)",
-    batteryHealth: "98%",
-    storage: "512GB",
-    ownerName: "Alexander Vance",
-    ownerPhone: "+91 9876543210",
-    description: "Barely used, original box and titanium case included. No scratches.",
-    images: ["https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A"],
-    status: "Pending Approval",
-    submittedAt: "2026-08-09 09:30 AM"
-  }
-];
-
-// Load State from LocalStorage
-let storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
-let sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || DEFAULT_SELL_REQUESTS;
+// App State
+let adminRequests = [];
+let adminProducts = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  initAdminTabs();
+  loadAdminState();
   renderAdminRequests();
   renderAdminProducts();
   updateMetrics();
   initAddProductForm();
-  initEditModal();
+  initEditProductForm();
 });
 
-/* ==========================================
-   1. ADMIN TAB NAVIGATION
-   ========================================== */
-function initAdminTabs() {
-  const tabBtns = document.querySelectorAll('.admin-tab-btn');
-  const tabContents = document.querySelectorAll('.admin-tab-content');
+function loadAdminState() {
+  adminRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
+  adminProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
 
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetTab = btn.getAttribute('data-tab');
-
-      tabBtns.forEach(b => {
-        b.classList.remove('bg-gold', 'text-primary', 'shadow-md');
-        b.classList.add('bg-surface-low', 'text-white/70');
-      });
-
-      btn.classList.remove('bg-surface-low', 'text-white/70');
-      btn.classList.add('bg-gold', 'text-primary', 'shadow-md');
-
-      tabContents.forEach(c => c.classList.add('hidden'));
-      const activeContent = document.getElementById(`admin-tab-${targetTab}`);
-      if (activeContent) activeContent.classList.remove('hidden');
-    });
-  });
+  if (!localStorage.getItem('hunthub_products')) {
+    localStorage.setItem('hunthub_products', JSON.stringify(DEFAULT_PRODUCTS));
+  }
 }
 
-/* ==========================================
-   2. UPDATE METRICS COUNTERS
-   ========================================== */
 function updateMetrics() {
+  const pendingRequests = adminRequests.filter(r => r.status === "Pending Approval");
+  
   const pendingCountEl = document.getElementById('metric-pending-count');
-  const productsCountEl = document.getElementById('metric-products-count');
+  const liveCountEl = document.getElementById('metric-live-count');
+  const tabPendingBadge = document.getElementById('tab-badge-requests');
+  const tabProductsBadge = document.getElementById('tab-badge-products');
 
-  sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || sellRequests;
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || storeProducts;
-
-  const pendingItems = sellRequests.filter(r => r.status === "Pending Approval");
-
-  if (pendingCountEl) pendingCountEl.textContent = pendingItems.length;
-  if (productsCountEl) productsCountEl.textContent = storeProducts.length;
+  if (pendingCountEl) pendingCountEl.textContent = pendingRequests.length;
+  if (liveCountEl) liveCountEl.textContent = adminProducts.length;
+  if (tabPendingBadge) tabPendingBadge.textContent = pendingRequests.length;
+  if (tabProductsBadge) tabProductsBadge.textContent = adminProducts.length;
 }
 
 /* ==========================================
-   3. RENDER PENDING SELLING REQUESTS
+   1. TAB SWITCHING LOGIC
+   ========================================== */
+function switchAdminTab(tabName) {
+  const tabBtnRequests = document.getElementById('tab-requests-btn');
+  const tabBtnProducts = document.getElementById('tab-products-btn');
+  const tabBtnWhatsapp = document.getElementById('tab-whatsapp-btn');
+
+  const contentRequests = document.getElementById('tab-content-requests');
+  const contentProducts = document.getElementById('tab-content-products');
+  const contentWhatsapp = document.getElementById('tab-content-whatsapp');
+
+  // Reset tab button states
+  [tabBtnRequests, tabBtnProducts, tabBtnWhatsapp].forEach(btn => {
+    if (btn) {
+      btn.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-transparent text-secondary hover:text-white transition-colors shrink-0 flex items-center gap-2";
+    }
+  });
+
+  // Hide contents
+  if (contentRequests) contentRequests.classList.add('hidden');
+  if (contentProducts) contentProducts.classList.add('hidden');
+  if (contentWhatsapp) contentWhatsapp.classList.add('hidden');
+
+  // Show active tab
+  if (tabName === 'requests') {
+    if (tabBtnRequests) tabBtnRequests.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-gold text-gold transition-colors shrink-0 flex items-center gap-2";
+    if (contentRequests) contentRequests.classList.remove('hidden');
+    renderAdminRequests();
+  } else if (tabName === 'products') {
+    if (tabBtnProducts) tabBtnProducts.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-gold text-gold transition-colors shrink-0 flex items-center gap-2";
+    if (contentProducts) contentProducts.classList.remove('hidden');
+    renderAdminProducts();
+  } else if (tabName === 'whatsapp') {
+    if (tabBtnWhatsapp) tabBtnWhatsapp.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-gold text-gold transition-colors shrink-0 flex items-center gap-2";
+    if (contentWhatsapp) contentWhatsapp.classList.remove('hidden');
+  }
+}
+
+/* ==========================================
+   2. PENDING REQUESTS REVIEW & APPROVAL/REJECTION
    ========================================== */
 function renderAdminRequests() {
-  const container = document.getElementById('admin-requests-list');
+  const container = document.getElementById('admin-requests-container');
   if (!container) return;
 
-  sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || sellRequests;
-  
-  // Filter out any non-pending items (or items rejected) so ONLY active Pending items are rendered
-  const pendingRequests = sellRequests.filter(r => r.status === "Pending Approval");
+  loadAdminState();
+  updateMetrics();
 
-  container.innerHTML = '';
+  const pendingRequests = adminRequests.filter(r => r.status === "Pending Approval");
 
   if (pendingRequests.length === 0) {
     container.innerHTML = `
-      <div class="bg-surface p-12 text-center border border-white/10 text-white/50 font-body">
-        <span class="material-symbols-outlined text-4xl text-gold/40 mb-2 block">task_alt</span>
-        No pending device selling requests at this time. All submissions have been processed!
+      <div class="col-span-full p-12 text-center border border-dashed border-dark-border bg-dark-card">
+        <span class="material-symbols-outlined text-4xl text-gold mb-2 block">task_alt</span>
+        <h3 class="font-display text-xl text-white font-bold">No Pending Submissions</h3>
+        <p class="font-body text-xs text-secondary mt-1">All user phone selling requests have been processed.</p>
       </div>
     `;
-    updateMetrics();
     return;
   }
 
-  pendingRequests.forEach((req) => {
+  container.innerHTML = '';
+
+  pendingRequests.forEach(req => {
+    const defaultRetailPrice = Math.round(req.expectedPrice * 1.15);
+
     const card = document.createElement('div');
-    card.className = "bg-surface border border-white/10 p-6 sm:p-8 flex flex-col gap-6 text-white shadow-lg transition-all duration-300";
-    card.id = `req-card-${req.id}`;
-
+    card.id = `request-card-${req.id}`;
+    card.className = "bg-dark-card border border-dark-border p-5 sm:p-6 flex flex-col justify-between transition-all duration-300 hover:border-gold/50";
+    
     card.innerHTML = `
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-6">
-        <div>
-          <div class="flex items-center gap-3">
-            <h3 class="font-display text-2xl font-bold text-gold">${req.model}</h3>
-            <span class="px-3 py-1 text-[11px] font-label font-bold uppercase tracking-wider bg-yellow-500/20 text-yellow-400 border border-yellow-500/40">
-              Pending Review
-            </span>
+      <div class="space-y-4">
+        <!-- Status & Submitted Time -->
+        <div class="flex justify-between items-center border-b border-dark-border pb-3">
+          <span class="bg-amber-500/20 text-amber-400 font-label text-[10px] uppercase tracking-wider px-2.5 py-0.5 border border-amber-500/30 font-bold">
+            ${req.status}
+          </span>
+          <span class="font-label text-[10px] text-secondary">${req.submittedAt}</span>
+        </div>
+
+        <!-- Phone Model & Image Preview -->
+        <div class="flex gap-4 items-start">
+          <div class="w-20 h-20 bg-dark-bg shrink-0 overflow-hidden border border-dark-border">
+            <img src="${req.images[0]}" class="w-full h-full object-cover" alt="${req.model}">
           </div>
-          <p class="font-label text-xs text-white/60 mt-2">Owner: <strong class="text-white">${req.ownerName}</strong> (${req.ownerPhone}) • Submitted: ${req.submittedAt}</p>
-        </div>
-
-        <div class="text-left md:text-right bg-black/40 p-3 border border-white/10">
-          <span class="font-label text-[10px] text-white/50 block uppercase tracking-widest">User Expected Price</span>
-          <span class="font-serif text-xl text-white font-bold">$${Number(req.expectedPrice).toLocaleString()}</span>
-        </div>
-      </div>
-
-      <!-- Specs Grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-label text-white/80 bg-black/60 p-4 border border-white/10">
-        <div><span class="text-white/40 block">Condition:</span> <strong class="text-white">${req.condition}</strong></div>
-        <div><span class="text-white/40 block">Battery Health:</span> <strong class="text-white">${req.batteryHealth}</strong></div>
-        <div><span class="text-white/40 block">Storage:</span> <strong class="text-white">${req.storage}</strong></div>
-        <div>
-          <span class="text-white/40 block">WhatsApp Contact:</span> 
-          <a href="https://wa.me/${req.ownerPhone.replace(/[^0-9]/g,'')}" target="_blank" class="text-green-400 font-bold hover:underline flex items-center gap-1">
-            <span class="material-symbols-outlined text-xs">chat</span> ${req.ownerPhone}
-          </a>
-        </div>
-      </div>
-
-      <p class="font-body text-sm text-white/80 italic bg-black/30 p-3 border-l-2 border-gold">"${req.description}"</p>
-
-      <!-- Photos Preview -->
-      <div>
-        <span class="font-label text-[10px] text-white/50 block uppercase tracking-widest mb-2">Uploaded Device Photos:</span>
-        <div class="flex items-center gap-4 overflow-x-auto py-1">
-          ${req.images.map(img => `
-            <a href="${img}" target="_blank" title="Click to inspect full photo">
-              <img src="${img}" class="w-20 h-20 object-cover border border-white/30 hover:border-gold transition-all">
-            </a>
-          `).join('')}
-        </div>
-      </div>
-
-      <!-- Admin Profit & Actions -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-white/10 mt-2 bg-black/40 p-4">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-          <label class="font-label text-xs text-gold font-bold uppercase tracking-wider">Set Store Retail Price (with Profit):</label>
-          <div class="flex items-center gap-1">
-            <span class="font-serif text-lg text-gold font-bold">$</span>
-            <input type="number" id="profit-price-${req.id}" value="${Math.round(req.expectedPrice * 1.25)}" 
-                   class="bg-black border border-gold/60 px-4 py-2 text-base text-white font-bold w-36 focus:outline-none focus:border-gold">
+          <div>
+            <h3 class="font-display text-lg text-white font-bold">${req.model}</h3>
+            <div class="flex flex-wrap gap-2 mt-1">
+              <span class="bg-dark-bg text-secondary text-[10px] font-label px-2 py-0.5 border border-dark-border">${req.storage}</span>
+              <span class="bg-dark-bg text-secondary text-[10px] font-label px-2 py-0.5 border border-dark-border">${req.condition}</span>
+              <span class="bg-dark-bg text-secondary text-[10px] font-label px-2 py-0.5 border border-dark-border">Battery: ${req.batteryHealth}</span>
+            </div>
           </div>
         </div>
 
-        <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
-          <button onclick="approveSellRequest('${req.id}')" 
-                  class="bg-gold text-primary hover:bg-white px-6 py-3 font-label text-xs uppercase font-bold tracking-widest shadow-md transition-all">
-            Approve & Publish to Store
-          </button>
-          <button onclick="rejectSellRequest('${req.id}')" 
-                  class="bg-red-950/80 hover:bg-red-800 text-white px-5 py-3 font-label text-xs uppercase font-bold tracking-widest border border-red-500/50 transition-colors">
-            Reject Request
-          </button>
+        <!-- Owner & Price Details -->
+        <div class="bg-dark-bg p-3.5 border border-dark-border/80 space-y-2 text-xs">
+          <div class="flex justify-between">
+            <span class="text-secondary font-label">Seller:</span>
+            <span class="text-white font-semibold">${req.ownerName} (${req.ownerPhone})</span>
+          </div>
+          <div class="flex justify-between border-t border-dark-border/50 pt-2">
+            <span class="text-secondary font-label">User Expected Price:</span>
+            <span class="text-amber-400 font-bold">$${req.expectedPrice.toLocaleString()}</span>
+          </div>
         </div>
+
+        <!-- Description -->
+        <p class="font-body text-xs text-secondary line-clamp-2 italic">
+          "${req.description}"
+        </p>
+
+        <!-- Admin Retail Price Input (Adding Profit Margin) -->
+        <div class="pt-2 border-t border-dark-border">
+          <label class="font-label text-[11px] text-gold font-bold block mb-1">
+            Store Retail Price ($) - Add Profit Margin:
+          </label>
+          <div class="flex gap-2">
+            <span class="bg-dark-bg text-gold font-bold px-3 py-2 border border-dark-border flex items-center">$</span>
+            <input type="number" id="retail-price-${req.id}" value="${defaultRetailPrice}" 
+                   class="w-full bg-dark-bg border border-dark-border px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-gold">
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="grid grid-cols-2 gap-3 pt-5 mt-4 border-t border-dark-border">
+        <button onclick="rejectSellRequest('${req.id}')" 
+                class="bg-red-950/40 text-red-400 border border-red-900/50 hover:bg-red-900 hover:text-white px-3 py-2.5 font-label text-[11px] uppercase tracking-wider font-bold transition-colors">
+          REJECT REQUEST
+        </button>
+
+        <button onclick="approveSellRequest('${req.id}')" 
+                class="bg-gold text-primary hover:bg-white px-3 py-2.5 font-label text-[11px] uppercase tracking-wider font-bold transition-colors">
+          APPROVE & PUBLISH
+        </button>
       </div>
     `;
 
     container.appendChild(card);
   });
-
-  updateMetrics();
 }
 
-/* ==========================================
-   FIX REJECTION: INSTANT REMOVAL FROM UI & STATE
-   ========================================== */
-function rejectSellRequest(requestId) {
-  sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || sellRequests;
-
-  // Completely filter out the rejected submission record from active sellRequests state
-  sellRequests = sellRequests.filter(r => r.id !== requestId);
-  localStorage.setItem('hunthub_sell_requests', JSON.stringify(sellRequests));
-
-  // Animate card removal in UI if visible
-  const card = document.getElementById(`req-card-${requestId}`);
-  if (card) {
-    card.style.opacity = '0';
-    card.style.transform = 'scale(0.95)';
-    setTimeout(() => {
-      renderAdminRequests();
-    }, 300);
-  } else {
-    renderAdminRequests();
-  }
-
-  showToast('Request Rejected', 'The selling submission has been completely removed from the review queue.');
-}
-
-// Approve User Selling Request & Sync to Public Store Catalog
 function approveSellRequest(requestId) {
-  sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || sellRequests;
-  const req = sellRequests.find(r => r.id === requestId);
+  const req = adminRequests.find(r => r.id === requestId);
   if (!req) return;
 
-  const profitInput = document.getElementById(`profit-price-${requestId}`);
-  const finalPrice = profitInput ? Number(profitInput.value) : Math.round(req.expectedPrice * 1.25);
-
-  // Remove from pending review queue
-  sellRequests = sellRequests.filter(r => r.id !== requestId);
-  localStorage.setItem('hunthub_sell_requests', JSON.stringify(sellRequests));
-
-  // Add to Store Catalog in LocalStorage
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || storeProducts;
+  const retailInput = document.getElementById(`retail-price-${requestId}`);
+  const finalPrice = retailInput ? Number(retailInput.value) : Math.round(req.expectedPrice * 1.15);
 
   const newProduct = {
-    id: `prod-approved-${Date.now()}`,
+    id: `prod-${Date.now()}`,
     name: req.model,
-    tagline: `${req.condition} • ${req.storage}`,
+    tagline: `${req.storage} | ${req.condition}`,
     price: finalPrice,
     currency: "$",
     badge: "Certified Pre-Owned",
     image: req.images[0] || "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A",
-    description: `${req.model} (${req.condition}, Battery Health: ${req.batteryHealth}). Owner Notes: ${req.description}`
+    description: `Certified Pre-Owned ${req.model} (${req.storage}, ${req.condition}, Battery: ${req.batteryHealth}). Seller Notes: ${req.description}`
   };
 
-  storeProducts.unshift(newProduct);
-  localStorage.setItem('hunthub_products', JSON.stringify(storeProducts));
+  adminProducts.unshift(newProduct);
+  localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
 
-  renderAdminRequests();
-  renderAdminProducts();
-  showToast('Approved & Published', `"${req.model}" approved at $${finalPrice.toLocaleString()} and published to the live store!`);
+  // Remove request from pending list completely
+  adminRequests = adminRequests.filter(r => r.id !== requestId);
+  localStorage.setItem('hunthub_sell_requests', JSON.stringify(adminRequests));
+
+  const card = document.getElementById(`request-card-${requestId}`);
+  if (card) {
+    card.style.transition = 'all 0.4s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      renderAdminRequests();
+      renderAdminProducts();
+      showToast('Approved & Published', `${req.model} has been published to live store catalog for $${finalPrice}!`);
+    }, 350);
+  }
+}
+
+function rejectSellRequest(requestId) {
+  const req = adminRequests.find(r => r.id === requestId);
+  
+  // Completely filter out rejected item from state and storage
+  adminRequests = adminRequests.filter(r => r.id !== requestId);
+  localStorage.setItem('hunthub_sell_requests', JSON.stringify(adminRequests));
+
+  const card = document.getElementById(`request-card-${requestId}`);
+  if (card) {
+    card.style.transition = 'all 0.4s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      renderAdminRequests();
+      showToast('Request Rejected', `Request for ${req ? req.model : 'device'} has been removed.`);
+    }, 350);
+  } else {
+    renderAdminRequests();
+  }
 }
 
 /* ==========================================
-   4. MANAGE LIVE STORE CATALOG (EDIT & DELETE)
+   3. STORE INVENTORY EDIT & DELETE MANAGEMENT
    ========================================== */
 function renderAdminProducts() {
-  const container = document.getElementById('admin-products-list');
+  const container = document.getElementById('admin-products-container');
   if (!container) return;
 
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || storeProducts;
+  loadAdminState();
+  updateMetrics();
+
+  if (adminProducts.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full p-12 text-center border border-dashed border-dark-border bg-dark-card">
+        <span class="material-symbols-outlined text-4xl text-gold mb-2 block">inventory_2</span>
+        <h3 class="font-display text-xl text-white font-bold">No Products in Catalog</h3>
+        <p class="font-body text-xs text-secondary mt-1">Click "Add Custom Item" to populate your store inventory.</p>
+      </div>
+    `;
+    return;
+  }
+
   container.innerHTML = '';
 
-  storeProducts.forEach(prod => {
-    const row = document.createElement('div');
-    row.className = "bg-surface border border-white/10 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-white shadow-sm hover:border-gold/40 transition-colors";
-    row.innerHTML = `
-      <div class="flex items-center gap-4">
-        <img src="${prod.image}" class="w-16 h-16 object-cover border border-white/20 shrink-0">
-        <div>
-          <div class="flex items-center gap-2">
-            <h4 class="font-display font-semibold text-gold text-lg">${prod.name}</h4>
-            <span class="px-2 py-0.5 text-[10px] font-label font-bold uppercase bg-white/10 text-white/80">${prod.badge || 'Store Item'}</span>
-          </div>
-          <p class="font-label text-xs text-white/60 mt-1">${prod.tagline || ''}</p>
-          <p class="font-body text-xs text-white/50 line-clamp-1 max-w-xl">${prod.description || ''}</p>
+  adminProducts.forEach(prod => {
+    const card = document.createElement('div');
+    card.id = `product-card-${prod.id}`;
+    card.className = "bg-dark-card border border-dark-border p-5 flex flex-col justify-between space-y-4 hover:border-gold/40 transition-all duration-300";
+
+    card.innerHTML = `
+      <div class="space-y-3">
+        <!-- Image & Badge -->
+        <div class="w-full h-44 bg-dark-bg border border-dark-border overflow-hidden relative">
+          <img src="${prod.image}" class="w-full h-full object-cover object-center" alt="${prod.name}">
+          ${prod.badge ? `
+            <div class="absolute top-3 left-3 bg-dark-bg/90 border border-gold/40 px-2 py-0.5">
+              <span class="font-label text-[9px] text-gold font-bold uppercase tracking-wider">${prod.badge}</span>
+            </div>
+          ` : ''}
         </div>
+
+        <!-- Title & Tagline -->
+        <div>
+          <div class="flex justify-between items-start gap-2">
+            <h3 class="font-display text-base text-white font-bold">${prod.name}</h3>
+            <span class="font-serif text-sm text-gold font-bold">${prod.currency || '$'}${Number(prod.price).toLocaleString()}</span>
+          </div>
+          <p class="font-label text-[10px] text-secondary uppercase tracking-wider">${prod.tagline || 'Custom Luxury Edition'}</p>
+        </div>
+
+        <!-- Description -->
+        <p class="font-body text-xs text-secondary line-clamp-2">
+          ${prod.description || 'No description added.'}
+        </p>
       </div>
 
-      <div class="flex items-center gap-4 self-end sm:self-center">
-        <span class="font-serif text-xl text-white font-bold">${prod.currency || '$'}${Number(prod.price).toLocaleString()}</span>
-        
-        <!-- EDIT BUTTON -->
+      <!-- Action Buttons (EDIT & DELETE) -->
+      <div class="grid grid-cols-2 gap-3 pt-3 border-t border-dark-border">
         <button onclick="openEditModal('${prod.id}')" 
-                class="bg-gold/20 hover:bg-gold text-gold hover:text-primary px-3.5 py-1.5 font-label text-xs font-bold uppercase tracking-wider border border-gold/40 transition-all flex items-center gap-1">
+                class="bg-dark-bg border border-gold/40 hover:bg-gold hover:text-primary text-gold px-3 py-2 font-label text-[10px] uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-1">
           <span class="material-symbols-outlined text-sm">edit</span> EDIT
         </button>
 
-        <!-- DELETE BUTTON -->
         <button onclick="deleteProduct('${prod.id}')" 
-                class="bg-red-950/60 hover:bg-red-700 text-red-300 hover:text-white px-3.5 py-1.5 font-label text-xs font-bold uppercase tracking-wider border border-red-500/40 transition-colors flex items-center gap-1">
+                class="bg-dark-bg border border-red-900/50 hover:bg-red-900 text-red-400 hover:text-white px-3 py-2 font-label text-[10px] uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-1">
           <span class="material-symbols-outlined text-sm">delete</span> DELETE
         </button>
       </div>
     `;
-    container.appendChild(row);
+
+    container.appendChild(card);
   });
-
-  updateMetrics();
 }
 
-/* ==========================================
-   EDIT PRODUCT MODAL LOGIC
-   ========================================== */
-function initEditModal() {
-  const modal = document.getElementById('admin-edit-modal');
-  const closeBtn = document.getElementById('close-edit-modal');
-  const cancelBtn = document.getElementById('cancel-edit-modal');
-  const form = document.getElementById('admin-edit-product-form');
-  const imageInput = document.getElementById('edit-prod-image');
-  const previewImg = document.getElementById('edit-preview-img');
-
-  if (closeBtn) closeBtn.onclick = closeEditModal;
-  if (cancelBtn) cancelBtn.onclick = closeEditModal;
-
-  if (imageInput && previewImg) {
-    imageInput.addEventListener('input', () => {
-      previewImg.src = imageInput.value;
-    });
-  }
-
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const id = document.getElementById('edit-prod-id').value;
-      const name = document.getElementById('edit-prod-name').value.trim();
-      const price = Number(document.getElementById('edit-prod-price').value);
-      const tagline = document.getElementById('edit-prod-tagline').value.trim();
-      const badge = document.getElementById('edit-prod-badge').value;
-      const image = document.getElementById('edit-prod-image').value.trim();
-      const desc = document.getElementById('edit-prod-desc').value.trim();
-
-      storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || storeProducts;
-
-      const prodIndex = storeProducts.findIndex(p => p.id === id);
-      if (prodIndex !== -1) {
-        storeProducts[prodIndex] = {
-          ...storeProducts[prodIndex],
-          name: name,
-          price: price,
-          tagline: tagline,
-          badge: badge,
-          image: image,
-          description: desc
-        };
-
-        localStorage.setItem('hunthub_products', JSON.stringify(storeProducts));
-        renderAdminProducts();
-        closeEditModal();
-        showToast('Changes Saved', `"${name}" product details and price updated successfully!`);
-      }
-    });
-  }
-}
-
+/* Edit Modal Logic */
 function openEditModal(productId) {
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || storeProducts;
-  const prod = storeProducts.find(p => p.id === productId);
+  const prod = adminProducts.find(p => p.id === productId);
   if (!prod) return;
 
+  const modal = document.getElementById('admin-edit-modal');
+  if (!modal) return;
+
   document.getElementById('edit-prod-id').value = prod.id;
-  document.getElementById('edit-prod-name').value = prod.name;
+  document.getElementById('edit-prod-title').value = prod.name;
   document.getElementById('edit-prod-price').value = prod.price;
   document.getElementById('edit-prod-tagline').value = prod.tagline || '';
-  document.getElementById('edit-prod-badge').value = prod.badge || 'Exclusive';
-  document.getElementById('edit-prod-image').value = prod.image || '';
+  document.getElementById('edit-prod-badge').value = prod.badge || '';
+  document.getElementById('edit-prod-image').value = prod.image;
   document.getElementById('edit-prod-desc').value = prod.description || '';
 
-  const previewImg = document.getElementById('edit-preview-img');
-  if (previewImg) previewImg.src = prod.image || '';
+  const previewEl = document.getElementById('edit-prod-image-preview');
+  if (previewEl) {
+    previewEl.innerHTML = `<img src="${prod.image}" class="w-full h-full object-cover">`;
+  }
 
-  const modal = document.getElementById('admin-edit-modal');
-  if (modal) modal.classList.add('active');
+  modal.classList.add('active');
 }
 
 function closeEditModal() {
@@ -414,59 +387,110 @@ function closeEditModal() {
   if (modal) modal.classList.remove('active');
 }
 
-function deleteProduct(productId) {
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || storeProducts;
-  const prod = storeProducts.find(p => p.id === productId);
-  const name = prod ? prod.name : 'Item';
+function initEditProductForm() {
+  const form = document.getElementById('admin-edit-form');
+  const imageInput = document.getElementById('edit-prod-image');
+  const previewEl = document.getElementById('edit-prod-image-preview');
 
-  storeProducts = storeProducts.filter(p => p.id !== productId);
-  localStorage.setItem('hunthub_products', JSON.stringify(storeProducts));
+  if (imageInput && previewEl) {
+    imageInput.addEventListener('input', (e) => {
+      const url = e.target.value.trim();
+      if (url) {
+        previewEl.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+      } else {
+        previewEl.innerHTML = `<span class="text-xs text-secondary">Image Preview</span>`;
+      }
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('edit-prod-id').value;
+      const title = document.getElementById('edit-prod-title').value.trim();
+      const price = Number(document.getElementById('edit-prod-price').value);
+      const tagline = document.getElementById('edit-prod-tagline').value.trim();
+      const badge = document.getElementById('edit-prod-badge').value.trim();
+      const image = document.getElementById('edit-prod-image').value.trim();
+      const desc = document.getElementById('edit-prod-desc').value.trim();
+
+      const index = adminProducts.findIndex(p => p.id === id);
+      if (index !== -1) {
+        adminProducts[index] = {
+          ...adminProducts[index],
+          name: title,
+          price: price,
+          tagline: tagline,
+          badge: badge,
+          image: image,
+          description: desc
+        };
+
+        localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
+        closeEditModal();
+        renderAdminProducts();
+        showToast('Changes Saved', `${title} details updated successfully.`);
+      }
+    });
+  }
+}
+
+function deleteProduct(productId) {
+  const prod = adminProducts.find(p => p.id === productId);
+  if (!confirm(`Are you sure you want to delete "${prod ? prod.name : 'this item'}" from live store catalog?`)) {
+    return;
+  }
+
+  adminProducts = adminProducts.filter(p => p.id !== productId);
+  localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
+
   renderAdminProducts();
-  showToast('Item Deleted', `"${name}" removed from store catalog.`);
+  showToast('Item Deleted', 'Product has been removed from catalog.');
+}
+
+/* Add Custom Product Form Logic */
+function toggleAddProductForm() {
+  const container = document.getElementById('admin-add-product-container');
+  if (container) container.classList.toggle('hidden');
 }
 
 function initAddProductForm() {
-  const addProdForm = document.getElementById('admin-add-product-form');
-  if (!addProdForm) return;
+  const form = document.getElementById('admin-add-product-form');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
 
-  addProdForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const name = document.getElementById('admin-prod-name').value.trim();
-    const price = document.getElementById('admin-prod-price').value.trim();
-    const tagline = document.getElementById('admin-prod-tagline').value.trim();
-    const badge = document.getElementById('admin-prod-badge').value;
-    const imageUrl = document.getElementById('admin-prod-image').value.trim();
-    const desc = document.getElementById('admin-prod-desc').value.trim();
+      const title = document.getElementById('add-prod-title').value.trim();
+      const price = Number(document.getElementById('add-prod-price').value);
+      const tagline = document.getElementById('add-prod-tagline').value.trim();
+      const badge = document.getElementById('add-prod-badge').value.trim();
+      const image = document.getElementById('add-prod-image').value.trim();
+      const desc = document.getElementById('add-prod-desc').value.trim();
 
-    if (!name || !price) {
-      showToast('Missing Info', 'Please enter Name and Retail Price.');
-      return;
-    }
+      const newProd = {
+        id: `prod-${Date.now()}`,
+        name: title,
+        price: price,
+        currency: "$",
+        tagline: tagline || "Custom Luxury Edition",
+        badge: badge || "New",
+        image: image,
+        description: desc || title
+      };
 
-    const newProd = {
-      id: `prod-${Date.now()}`,
-      name: name,
-      tagline: tagline || "Exclusive Edition",
-      price: Number(price),
-      currency: "$",
-      badge: badge || "Exclusive",
-      image: imageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A",
-      description: desc || name
-    };
+      adminProducts.unshift(newProd);
+      localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
 
-    storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || storeProducts;
-    storeProducts.unshift(newProd);
-    localStorage.setItem('hunthub_products', JSON.stringify(storeProducts));
-    
-    renderAdminProducts();
-    addProdForm.reset();
-    showToast('Product Added', `"${name}" is now live on the public website!`);
-  });
+      form.reset();
+      toggleAddProductForm();
+      renderAdminProducts();
+      showToast('Item Added', `${title} is now published in store catalog!`);
+    });
+  }
 }
 
-/* ==========================================
-   5. TOAST NOTIFICATION HELPER
-   ========================================== */
+/* Toast Helper */
 function showToast(title, message) {
   let toast = document.getElementById('toast-notice');
   if (!toast) {
@@ -478,7 +502,7 @@ function showToast(title, message) {
 
   toast.innerHTML = `
     <div class="font-label text-xs text-gold tracking-widest mb-1 font-bold">${title}</div>
-    <div class="font-body text-sm opacity-90">${message}</div>
+    <div class="font-body text-xs opacity-90">${message}</div>
   `;
 
   toast.classList.add('show');
