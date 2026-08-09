@@ -2,7 +2,7 @@
  * HUNTHUB ft. Animesh - Digital Craftsmanship Interactive Application
  * Features: Header Branding ("HUNTHUB ft. Animesh"), Rupee Currency Formatting (₹),
  * Systematic Price Sorting (Lower price at top, higher price below),
- * Instant Real-Time Section Sync from Admin Control Panel, Auto Photo Changer Gallery.
+ * Mobile Smartphone Camera Image Compression, Instant Real-Time Section Sync from Admin Control Panel, Auto Photo Changer Gallery.
  */
 
 const WHATSAPP_NUMBER = "917086869464";
@@ -48,6 +48,50 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 400);
 });
 
+/* Mobile Image Compression Utility */
+function compressAndResizeImage(file, maxDimension = 800, quality = 0.75) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')) {
+      return reject(new Error('Invalid image file'));
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDimension) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          }
+        } else {
+          if (height > maxDimension) {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      img.onerror = () => reject(new Error('Failed to load image for compression'));
+      img.src = e.target.result;
+    };
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
+
 /* Purge legacy demo items if present */
 function cleanupDemoProducts() {
   let stored = JSON.parse(localStorage.getItem('hunthub_products'));
@@ -57,8 +101,12 @@ function cleanupDemoProducts() {
     
     const cleaned = stored.filter(p => !demoIds.includes(p.id) && !demoNames.includes(p.name));
     if (cleaned.length !== stored.length) {
-      localStorage.setItem('hunthub_products', JSON.stringify(cleaned));
-      storeProducts = cleaned;
+      try {
+        localStorage.setItem('hunthub_products', JSON.stringify(cleaned));
+        storeProducts = cleaned;
+      } catch (e) {
+        console.error("Storage error cleanup:", e);
+      }
     }
   }
 }
@@ -281,7 +329,7 @@ function buyCartViaWhatsApp() {
 }
 
 /* ==========================================
-   3. USER PHONE SELLING FORM
+   3. USER PHONE SELLING FORM (Mobile Compressed Images)
    ========================================== */
 let uploadedImageUrls = [];
 
@@ -291,7 +339,7 @@ function initSellDeviceForm() {
   const previewContainer = document.getElementById('sell-images-preview');
 
   if (imageInput && previewContainer) {
-    imageInput.addEventListener('change', (e) => {
+    imageInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       previewContainer.innerHTML = '';
       uploadedImageUrls = [];
@@ -301,19 +349,19 @@ function initSellDeviceForm() {
         return;
       }
 
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const imgUrl = event.target.result;
+      for (const file of files) {
+        try {
+          const imgUrl = await compressAndResizeImage(file, 800, 0.75);
           uploadedImageUrls.push(imgUrl);
 
           const imgThumb = document.createElement('div');
           imgThumb.className = 'w-16 h-16 relative border border-accent/30 overflow-hidden shrink-0';
           imgThumb.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover">`;
           previewContainer.appendChild(imgThumb);
-        };
-        reader.readAsDataURL(file);
-      });
+        } catch (err) {
+          console.error("Sell image compression error:", err);
+        }
+      }
     });
   }
 
@@ -358,7 +406,11 @@ function initSellDeviceForm() {
 
       sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
       sellRequests.unshift(newRequest);
-      localStorage.setItem('hunthub_sell_requests', JSON.stringify(sellRequests));
+      try {
+        localStorage.setItem('hunthub_sell_requests', JSON.stringify(sellRequests));
+      } catch (err) {
+        console.error("Storage error on sell submit:", err);
+      }
 
       sellForm.reset();
       if (previewContainer) {

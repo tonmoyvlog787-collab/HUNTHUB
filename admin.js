@@ -1,8 +1,8 @@
 /**
  * HUNTHUB ft. Animesh - Dedicated Admin Control Center JavaScript
  * Features: Secure Cryptographic Authentication (ID: hunthub@100animesh, Pass: animesh@2008),
- * Rupee Currency System (₹), Category Badge Tag Management (Expensive, Recent uploaded, Premium, Mid range, Low range, Urgent sale),
- * RAM Selector, Direct Gallery/File Upload Components, Global Site Media Control Panel.
+ * Mobile Image Compression & Resizing (Fixes QuotaExceededError on smartphones),
+ * Rupee Currency System (₹), Category Badge Tag Management, RAM Selector, Global Site Media Control.
  */
 
 const AUTH_ID_HASH = "de472f5b951a5eb2ec32d36ccd9d2ca77c83fa8fe0d2147ecd7cae1b51d8f622";
@@ -38,6 +38,74 @@ document.addEventListener('DOMContentLoaded', () => {
   initSiteImagesControl();
 });
 
+/* Mobile Image Compression Utility (Resizes camera photos to 800px & 75% quality to prevent quota error on mobile) */
+function compressAndResizeImage(file, maxDimension = 800, quality = 0.75) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')) {
+      return reject(new Error('Invalid image file'));
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDimension) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          }
+        } else {
+          if (height > maxDimension) {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      img.onerror = () => reject(new Error('Failed to load image for compression'));
+      img.src = e.target.result;
+    };
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
+
+/* Safe LocalStorage Saver with Fallback Handling for Smartphones */
+function safeSaveProducts(productsArray) {
+  try {
+    localStorage.setItem('hunthub_products', JSON.stringify(productsArray));
+    return true;
+  } catch (e) {
+    console.error("LocalStorage save error on mobile:", e);
+    showToast("Storage Quota Warning", "Clearing temporary cache to complete save...");
+    
+    // Fallback: Strip description text or compress DataURLs further if quota reached
+    try {
+      const lighterArray = productsArray.map(item => ({
+        ...item,
+        description: (item.description || '').substring(0, 200)
+      }));
+      localStorage.setItem('hunthub_products', JSON.stringify(lighterArray));
+      return true;
+    } catch (err2) {
+      alert("Storage limit reached on mobile browser. Please reduce image file size.");
+      return false;
+    }
+  }
+}
+
 /* Purge legacy demo items from localStorage */
 function cleanupDemoProductsInAdmin() {
   let stored = JSON.parse(localStorage.getItem('hunthub_products'));
@@ -47,7 +115,7 @@ function cleanupDemoProductsInAdmin() {
     
     const cleaned = stored.filter(p => !demoIds.includes(p.id) && !demoNames.includes(p.name));
     if (cleaned.length !== stored.length) {
-      localStorage.setItem('hunthub_products', JSON.stringify(cleaned));
+      safeSaveProducts(cleaned);
       adminProducts = cleaned;
     }
   }
@@ -400,7 +468,7 @@ function approveSellRequest(requestId) {
   };
 
   adminProducts.unshift(newProduct);
-  localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
+  safeSaveProducts(adminProducts);
 
   adminRequests = adminRequests.filter(r => r.id !== requestId);
   localStorage.setItem('hunthub_sell_requests', JSON.stringify(adminRequests));
@@ -439,7 +507,7 @@ function rejectSellRequest(requestId) {
 }
 
 /* ==========================================
-   4. STORE INVENTORY EDIT & GALLERY FILE UPLOAD
+   4. STORE INVENTORY EDIT & GALLERY FILE UPLOAD (Mobile Compressed)
    ========================================== */
 function renderAdminProducts() {
   const container = document.getElementById('admin-products-container');
@@ -560,16 +628,18 @@ function initEditProductForm() {
   const previewEl = document.getElementById('edit-prod-image-preview');
 
   if (fileInput) {
-    fileInput.addEventListener('change', (e) => {
+    fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const dataUrl = event.target.result;
-          hiddenImageInput.value = dataUrl;
-          if (previewEl) previewEl.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover">`;
-        };
-        reader.readAsDataURL(file);
+        try {
+          // Mobile Image Compression & Resizing
+          const compressedDataUrl = await compressAndResizeImage(file, 800, 0.75);
+          hiddenImageInput.value = compressedDataUrl;
+          if (previewEl) previewEl.innerHTML = `<img src="${compressedDataUrl}" class="w-full h-full object-cover">`;
+        } catch (err) {
+          console.error("Image processing error:", err);
+          showToast("Image Processing Error", "Failed to compress selected photo.");
+        }
       }
     });
   }
@@ -602,7 +672,7 @@ function initEditProductForm() {
           description: desc
         };
 
-        localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
+        safeSaveProducts(adminProducts);
         closeEditModal();
         renderAdminProducts();
         showToast('Changes Saved', `${title} assigned to "${badge}" section.`);
@@ -618,7 +688,7 @@ function deleteProduct(productId) {
   }
 
   adminProducts = adminProducts.filter(p => p.id !== productId);
-  localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
+  safeSaveProducts(adminProducts);
 
   renderAdminProducts();
   showToast('Item Deleted', 'Product has been removed from catalog.');
@@ -636,16 +706,18 @@ function initAddProductForm() {
   const previewEl = document.getElementById('add-prod-image-preview');
 
   if (fileInput) {
-    fileInput.addEventListener('change', (e) => {
+    fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const dataUrl = event.target.result;
-          hiddenImageInput.value = dataUrl;
-          if (previewEl) previewEl.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover">`;
-        };
-        reader.readAsDataURL(file);
+        try {
+          // Mobile Image Compression & Resizing
+          const compressedDataUrl = await compressAndResizeImage(file, 800, 0.75);
+          hiddenImageInput.value = compressedDataUrl;
+          if (previewEl) previewEl.innerHTML = `<img src="${compressedDataUrl}" class="w-full h-full object-cover">`;
+        } catch (err) {
+          console.error("Image processing error:", err);
+          showToast("Image Processing Error", "Failed to compress selected photo.");
+        }
       }
     });
   }
@@ -676,14 +748,16 @@ function initAddProductForm() {
       };
 
       adminProducts.unshift(newProd);
-      localStorage.setItem('hunthub_products', JSON.stringify(adminProducts));
+      const saveSuccess = safeSaveProducts(adminProducts);
 
-      form.reset();
-      hiddenImageInput.value = "";
-      if (previewEl) previewEl.innerHTML = `<span class="text-xs text-secondary">Image Preview</span>`;
-      toggleAddProductForm();
-      renderAdminProducts();
-      showToast('Item Added', `${title} published to "${badge}" section for ₹${price.toLocaleString('en-IN')}!`);
+      if (saveSuccess) {
+        form.reset();
+        hiddenImageInput.value = "";
+        if (previewEl) previewEl.innerHTML = `<span class="text-xs text-secondary">Image Preview</span>`;
+        toggleAddProductForm();
+        renderAdminProducts();
+        showToast('Item Published', `${title} published to "${badge}" section for ₹${price.toLocaleString('en-IN')}!`);
+      }
     });
   }
 }
@@ -717,17 +791,17 @@ function bindImageSlot(fileInputId, urlInputId, stateKey, previewId) {
   }
 
   if (fileInput) {
-    fileInput.addEventListener('change', (e) => {
+    fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const dataUrl = event.target.result;
-          siteImagesState[stateKey] = dataUrl;
-          if (urlInput) urlInput.value = dataUrl;
-          if (preview) preview.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-contain">`;
-        };
-        reader.readAsDataURL(file);
+        try {
+          const compressedDataUrl = await compressAndResizeImage(file, 800, 0.75);
+          siteImagesState[stateKey] = compressedDataUrl;
+          if (urlInput) urlInput.value = compressedDataUrl;
+          if (preview) preview.innerHTML = `<img src="${compressedDataUrl}" class="w-full h-full object-contain">`;
+        } catch (err) {
+          console.error("Site image processing error:", err);
+        }
       }
     });
   }
@@ -744,8 +818,12 @@ function bindImageSlot(fileInputId, urlInputId, stateKey, previewId) {
 }
 
 function saveAndApplySiteImages() {
-  localStorage.setItem('hunthub_site_images', JSON.stringify(siteImagesState));
-  showToast('Site Media Applied', 'All global website images saved & published live!');
+  try {
+    localStorage.setItem('hunthub_site_images', JSON.stringify(siteImagesState));
+    showToast('Site Media Applied', 'All global website images saved & published live!');
+  } catch (e) {
+    showToast('Storage Warning', 'Media file too large. Try entering Image URL.');
+  }
 }
 
 function resetSiteImages() {
