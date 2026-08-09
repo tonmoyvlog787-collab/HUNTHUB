@@ -1,7 +1,7 @@
 /**
  * HUNTHUB ft. Animesh - Digital Craftsmanship Interactive Application
  * Features: Header Branding ("HUNTHUB ft. Animesh"), Rupee Currency Formatting (₹),
- * Dynamic Price Filter (₹1 to Max Limit), Real-time Admin Section Category Sync,
+ * Unified Category & Price Bracket Console (Slider Removed), Real-time Admin Section Category Sync,
  * Robust Multi-Item Category Section Filtering.
  */
 
@@ -14,14 +14,13 @@ const DEFAULT_PRODUCTS = [];
 let storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
 let sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
 let activeCategory = "all";
-let activeMaxPrice = Infinity;
+let activePricePreset = "all";
 
 document.addEventListener('DOMContentLoaded', () => {
   cleanupDemoProducts();
 
   initLoadingScreen();
   loadSiteImages();
-  initPriceFilter();
   renderStoreProducts();
   initScrollAnimations();
   initIconRippleEffects();
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'hunthub_site_images') loadSiteImages();
     if (e.key === 'hunthub_products') {
       storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || [];
-      initPriceFilter();
       renderStoreProducts();
     }
   });
@@ -46,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const latestProds = JSON.parse(localStorage.getItem('hunthub_products')) || [];
     if (JSON.stringify(latestProds) !== JSON.stringify(storeProducts)) {
       storeProducts = latestProds;
-      initPriceFilter();
       renderStoreProducts();
     }
   }, 800);
@@ -132,7 +129,7 @@ function loadSiteImages() {
 }
 
 /* ==========================================
-   1. RENDER CATALOG & SECTION CATEGORIES
+   1. RENDER CATALOG, SECTION CATEGORIES & PRICE BRACKETS
    ========================================== */
 function renderStoreProducts() {
   const container = document.getElementById('products-grid-container');
@@ -152,9 +149,15 @@ function renderStoreProducts() {
     });
   }
 
-  // 2. Apply Price Filter (only if activeMaxPrice is set to a specific number)
-  if (activeMaxPrice !== Infinity && !isNaN(activeMaxPrice)) {
-    filteredList = filteredList.filter(p => Number(p.price) <= activeMaxPrice);
+  // 2. Apply Price Bracket Filter
+  if (activePricePreset === 'under20k') {
+    filteredList = filteredList.filter(p => Number(p.price) < 20000);
+  } else if (activePricePreset === '20k-50k') {
+    filteredList = filteredList.filter(p => Number(p.price) >= 20000 && Number(p.price) <= 50000);
+  } else if (activePricePreset === '50k-100k') {
+    filteredList = filteredList.filter(p => Number(p.price) > 50000 && Number(p.price) <= 100000);
+  } else if (activePricePreset === 'above100k') {
+    filteredList = filteredList.filter(p => Number(p.price) > 100000);
   }
 
   container.innerHTML = '';
@@ -163,9 +166,9 @@ function renderStoreProducts() {
     container.innerHTML = `
       <div class="col-span-full p-12 text-center border border-dashed border-primary/20 bg-surface-low">
         <span class="material-symbols-outlined text-4xl text-accent mb-2 block">inventory_2</span>
-        <h3 class="font-display text-xl text-primary font-bold">No Items Found in ${activeCategory === 'all' ? 'Store' : '"' + activeCategory + '"'} Section</h3>
+        <h3 class="font-display text-xl text-primary font-bold">No Items Found</h3>
         <p class="font-body text-xs text-secondary mt-1">
-          ${storeProducts.length === 0 ? 'No phones published yet. Add items from the Admin Panel to populate this section.' : 'No phones found matching the selected section or price filter.'}
+          ${storeProducts.length === 0 ? 'No phones published yet. Add items from the Admin Panel to populate your catalog.' : 'No phones found matching the selected section and price bracket.'}
         </p>
         <button onclick="applyPriceFilter('all'); applyCategoryFilter('all');" class="mt-4 px-5 py-2 text-xs font-label uppercase font-bold text-gold border border-gold hover:bg-gold hover:text-primary transition-colors">
           Show All Items
@@ -232,88 +235,24 @@ function renderStoreProducts() {
 }
 
 /* ==========================================
-   PRICE RANGE FILTER LOGIC
+   PRICE BRACKET FILTERING CONTROLS
    ========================================== */
-function initPriceFilter() {
-  const slider = document.getElementById('price-range-slider');
-  const priceValEl = document.getElementById('price-range-value');
-
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || [];
-  
-  const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 300000);
-  const topLimit = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
-
-  if (slider && priceValEl) {
-    slider.min = 1000;
-    slider.max = topLimit;
-    
-    if (activeMaxPrice === Infinity) {
-      slider.value = topLimit;
-      priceValEl.textContent = `Rs 1 to Rs ${topLimit.toLocaleString('en-IN')}`;
-    } else {
-      slider.value = activeMaxPrice;
-      priceValEl.textContent = `Rs 1 to Rs ${activeMaxPrice.toLocaleString('en-IN')}`;
-    }
-
-    slider.oninput = (e) => {
-      const selectedLimit = Number(e.target.value);
-      activeMaxPrice = selectedLimit;
-      priceValEl.textContent = `Rs 1 to Rs ${selectedLimit.toLocaleString('en-IN')}`;
-
-      document.querySelectorAll('.price-filter-btn').forEach(btn => {
-        btn.classList.remove('bg-gold', 'text-primary', 'border-gold');
-        btn.classList.add('border-accent/30', 'text-secondary');
-      });
-
-      renderStoreProducts();
-    };
-  }
-}
-
 function applyPriceFilter(presetType) {
-  const slider = document.getElementById('price-range-slider');
-  const priceValEl = document.getElementById('price-range-value');
+  activePricePreset = presetType;
 
-  document.querySelectorAll('.price-filter-btn').forEach(btn => {
+  document.querySelectorAll('#price-filter-presets button').forEach(btn => {
     if (btn.getAttribute('data-filter') === presetType) {
-      btn.className = "price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-gold bg-gold text-primary tracking-wider transition-colors active";
+      btn.className = "price-filter-btn px-4 py-2 font-label text-[11px] uppercase font-bold border border-gold bg-gold text-primary tracking-wider transition-colors active shadow-sm";
     } else {
-      btn.className = "price-filter-btn px-3.5 py-1.5 font-label text-[10px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors";
+      btn.className = "price-filter-btn px-4 py-2 font-label text-[11px] uppercase font-bold border border-accent/30 hover:border-gold text-secondary hover:text-primary tracking-wider transition-colors";
     }
   });
-
-  storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || [];
-  const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 300000);
-
-  if (presetType === 'all') {
-    activeMaxPrice = Infinity;
-    const topLimit = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
-    if (slider) { slider.max = topLimit; slider.value = topLimit; }
-    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs ${topLimit.toLocaleString('en-IN')}`;
-  } else if (presetType === 'under50k') {
-    activeMaxPrice = 50000;
-    if (slider) slider.value = 50000;
-    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs 50,000`;
-  } else if (presetType === '50k-150k') {
-    activeMaxPrice = 150000;
-    if (slider) slider.value = 150000;
-    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs 1,50,000`;
-  } else if (presetType === 'above150k') {
-    activeMaxPrice = Infinity;
-    const topLimit = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
-    if (slider) slider.value = topLimit;
-    if (priceValEl) priceValEl.textContent = `Above Rs 1,50,000`;
-  }
 
   renderStoreProducts();
 }
 
 function applyCategoryFilter(categoryName) {
   activeCategory = categoryName;
-
-  // When user clicks a category tab, reset price slider constraint so all section items show up
-  activeMaxPrice = Infinity;
-  initPriceFilter();
 
   document.querySelectorAll('#category-filter-tabs button').forEach(btn => {
     if (btn.getAttribute('data-category') === categoryName) {
