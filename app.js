@@ -2,7 +2,7 @@
  * HUNTHUB ft. Animesh - Digital Craftsmanship Interactive Application
  * Features: Header Branding ("HUNTHUB ft. Animesh"), Rupee Currency Formatting (₹),
  * Dynamic Price Filter (₹1 to Max Limit), Real-time Admin Section Category Sync,
- * Clean Store Inventory (No Demo Items), Auto Photo Changer Gallery.
+ * Robust Multi-Item Category Section Filtering.
  */
 
 const WHATSAPP_NUMBER = "917086869464";
@@ -14,16 +14,15 @@ const DEFAULT_PRODUCTS = [];
 let storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
 let sellRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
 let activeCategory = "all";
-let activeMaxPrice = 500000;
+let activeMaxPrice = Infinity;
 
 document.addEventListener('DOMContentLoaded', () => {
-  // If localStorage contains demo products (Obsidian Apex, etc.), filter them out
   cleanupDemoProducts();
 
   initLoadingScreen();
   loadSiteImages();
-  renderStoreProducts();
   initPriceFilter();
+  renderStoreProducts();
   initScrollAnimations();
   initIconRippleEffects();
   initNavigationTracker();
@@ -50,10 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
       initPriceFilter();
       renderStoreProducts();
     }
-  }, 1000);
+  }, 800);
 });
 
-/* Remove old demo items if they exist in localStorage */
+/* Purge legacy demo items */
 function cleanupDemoProducts() {
   let stored = JSON.parse(localStorage.getItem('hunthub_products'));
   if (Array.isArray(stored) && stored.length > 0) {
@@ -66,6 +65,14 @@ function cleanupDemoProducts() {
       storeProducts = cleaned;
     }
   }
+}
+
+/* Helper to normalize category strings for foolproof matching */
+function normalizeCategoryString(str) {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, ""); // Strips emojis, spaces, hyphens
 }
 
 /* ==========================================
@@ -125,9 +132,9 @@ function loadSiteImages() {
 }
 
 /* ==========================================
-   1. RENDER CATALOG, SECTION CATEGORIES & RUPEE CURRENCY
+   1. RENDER CATALOG & SECTION CATEGORIES
    ========================================== */
-function renderStoreProducts(filterPredicate = null) {
+function renderStoreProducts() {
   const container = document.getElementById('products-grid-container');
   if (!container) return;
 
@@ -135,22 +142,19 @@ function renderStoreProducts(filterPredicate = null) {
   
   let filteredList = storeProducts;
 
-  // Apply Section Category Filter
+  // 1. Apply Section Category Filter
   if (activeCategory !== "all") {
+    const targetNorm = normalizeCategoryString(activeCategory);
     filteredList = filteredList.filter(p => {
-      const b = (p.badge || '').toLowerCase().trim();
-      const c = (p.category || '').toLowerCase().trim();
-      const target = activeCategory.toLowerCase().trim();
-      return b === target || c === target;
+      const bNorm = normalizeCategoryString(p.badge);
+      const cNorm = normalizeCategoryString(p.category);
+      return bNorm === targetNorm || cNorm === targetNorm;
     });
   }
 
-  // Apply Price Range Filter (Everything from ₹1 up to activeMaxPrice)
-  filteredList = filteredList.filter(p => Number(p.price) <= activeMaxPrice);
-
-  // Apply Extra Filter Predicate if provided
-  if (typeof filterPredicate === 'function') {
-    filteredList = filteredList.filter(filterPredicate);
+  // 2. Apply Price Filter (only if activeMaxPrice is set to a specific number)
+  if (activeMaxPrice !== Infinity && !isNaN(activeMaxPrice)) {
+    filteredList = filteredList.filter(p => Number(p.price) <= activeMaxPrice);
   }
 
   container.innerHTML = '';
@@ -159,9 +163,9 @@ function renderStoreProducts(filterPredicate = null) {
     container.innerHTML = `
       <div class="col-span-full p-12 text-center border border-dashed border-primary/20 bg-surface-low">
         <span class="material-symbols-outlined text-4xl text-accent mb-2 block">inventory_2</span>
-        <h3 class="font-display text-xl text-primary font-bold">No Items in ${activeCategory === 'all' ? 'Store' : '"' + activeCategory + '"'} Section</h3>
+        <h3 class="font-display text-xl text-primary font-bold">No Items Found in ${activeCategory === 'all' ? 'Store' : '"' + activeCategory + '"'} Section</h3>
         <p class="font-body text-xs text-secondary mt-1">
-          ${storeProducts.length === 0 ? 'No phones uploaded yet. Upload phones from the Admin Panel to populate this section.' : 'No phones found in this price range (Rs 1 up to Rs ' + activeMaxPrice.toLocaleString('en-IN') + ').'}
+          ${storeProducts.length === 0 ? 'No phones published yet. Add items from the Admin Panel to populate this section.' : 'No phones found matching the selected section or price filter.'}
         </p>
         <button onclick="applyPriceFilter('all'); applyCategoryFilter('all');" class="mt-4 px-5 py-2 text-xs font-label uppercase font-bold text-gold border border-gold hover:bg-gold hover:text-primary transition-colors">
           Show All Items
@@ -177,14 +181,15 @@ function renderStoreProducts(filterPredicate = null) {
     article.className = `group flex flex-col gap-5 scroll-reveal ${isEven ? 'md:mt-12' : ''}`;
     
     const displayBadge = prod.badge || prod.category || "Recent uploaded";
+    const badgeNorm = normalizeCategoryString(displayBadge);
 
     let badgeClass = "border border-primary/20 bg-surface/80 text-primary";
-    if (displayBadge === "Expensive") badgeClass = "badge-tag-expensive";
-    else if (displayBadge === "Recent uploaded") badgeClass = "badge-tag-recent";
-    else if (displayBadge === "Premium") badgeClass = "badge-tag-premium";
-    else if (displayBadge === "Mid range") badgeClass = "badge-tag-midrange";
-    else if (displayBadge === "Low range") badgeClass = "badge-tag-lowrange";
-    else if (displayBadge === "Urgent sale") badgeClass = "badge-tag-urgentsale";
+    if (badgeNorm.includes("expensive")) badgeClass = "badge-tag-expensive";
+    else if (badgeNorm.includes("recent")) badgeClass = "badge-tag-recent";
+    else if (badgeNorm.includes("premium")) badgeClass = "badge-tag-premium";
+    else if (badgeNorm.includes("mid")) badgeClass = "badge-tag-midrange";
+    else if (badgeNorm.includes("low")) badgeClass = "badge-tag-lowrange";
+    else if (badgeNorm.includes("urgent")) badgeClass = "badge-tag-urgentsale";
 
     article.innerHTML = `
       <div class="w-full aspect-[4/5] bg-surface-low overflow-hidden relative border border-accent/15 photo-clickable shadow-sm">
@@ -227,7 +232,7 @@ function renderStoreProducts(filterPredicate = null) {
 }
 
 /* ==========================================
-   PRICE RANGE FILTER LOGIC (Shows Rs 1 up to Selected Limit)
+   PRICE RANGE FILTER LOGIC
    ========================================== */
 function initPriceFilter() {
   const slider = document.getElementById('price-range-slider');
@@ -235,23 +240,26 @@ function initPriceFilter() {
 
   storeProducts = JSON.parse(localStorage.getItem('hunthub_products')) || [];
   
-  // Calculate highest price in catalog, default to 3,00,000 if catalog is empty
   const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 300000);
+  const topLimit = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
 
   if (slider && priceValEl) {
     slider.min = 1000;
-    slider.max = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
-    slider.value = slider.max;
-    activeMaxPrice = Number(slider.value);
-
-    priceValEl.textContent = `Rs 1 to Rs ${Number(slider.value).toLocaleString('en-IN')}`;
+    slider.max = topLimit;
+    
+    if (activeMaxPrice === Infinity) {
+      slider.value = topLimit;
+      priceValEl.textContent = `Rs 1 to Rs ${topLimit.toLocaleString('en-IN')}`;
+    } else {
+      slider.value = activeMaxPrice;
+      priceValEl.textContent = `Rs 1 to Rs ${activeMaxPrice.toLocaleString('en-IN')}`;
+    }
 
     slider.oninput = (e) => {
       const selectedLimit = Number(e.target.value);
       activeMaxPrice = selectedLimit;
       priceValEl.textContent = `Rs 1 to Rs ${selectedLimit.toLocaleString('en-IN')}`;
 
-      // Reset preset button highlight
       document.querySelectorAll('.price-filter-btn').forEach(btn => {
         btn.classList.remove('bg-gold', 'text-primary', 'border-gold');
         btn.classList.add('border-accent/30', 'text-secondary');
@@ -278,9 +286,10 @@ function applyPriceFilter(presetType) {
   const maxPriceInDataset = storeProducts.reduce((max, p) => Math.max(max, Number(p.price) || 0), 300000);
 
   if (presetType === 'all') {
-    activeMaxPrice = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
-    if (slider) { slider.max = activeMaxPrice; slider.value = activeMaxPrice; }
-    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs ${activeMaxPrice.toLocaleString('en-IN')}`;
+    activeMaxPrice = Infinity;
+    const topLimit = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
+    if (slider) { slider.max = topLimit; slider.value = topLimit; }
+    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs ${topLimit.toLocaleString('en-IN')}`;
   } else if (presetType === 'under50k') {
     activeMaxPrice = 50000;
     if (slider) slider.value = 50000;
@@ -290,9 +299,10 @@ function applyPriceFilter(presetType) {
     if (slider) slider.value = 150000;
     if (priceValEl) priceValEl.textContent = `Rs 1 to Rs 1,50,000`;
   } else if (presetType === 'above150k') {
-    activeMaxPrice = maxPriceInDataset > 150000 ? maxPriceInDataset : 300000;
-    if (slider) slider.value = activeMaxPrice;
-    if (priceValEl) priceValEl.textContent = `Rs 1 to Rs ${activeMaxPrice.toLocaleString('en-IN')}`;
+    activeMaxPrice = Infinity;
+    const topLimit = maxPriceInDataset > 0 ? maxPriceInDataset : 300000;
+    if (slider) slider.value = topLimit;
+    if (priceValEl) priceValEl.textContent = `Above Rs 1,50,000`;
   }
 
   renderStoreProducts();
@@ -300,6 +310,10 @@ function applyPriceFilter(presetType) {
 
 function applyCategoryFilter(categoryName) {
   activeCategory = categoryName;
+
+  // When user clicks a category tab, reset price slider constraint so all section items show up
+  activeMaxPrice = Infinity;
+  initPriceFilter();
 
   document.querySelectorAll('#category-filter-tabs button').forEach(btn => {
     if (btn.getAttribute('data-category') === categoryName) {
@@ -312,7 +326,7 @@ function applyCategoryFilter(categoryName) {
   renderStoreProducts();
   
   if (categoryName !== 'all') {
-    showToast('Section Active', `Displaying "${categoryName}" section items.`);
+    showToast('Section Filter Active', `Displaying "${categoryName}" section items.`);
   }
 }
 
