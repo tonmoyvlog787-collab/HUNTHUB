@@ -2,7 +2,7 @@
  * HUNTHUB ft. Animesh - Dedicated Admin Control Center JavaScript
  * Features: Secure Cryptographic Authentication (ID: hunthub@100animesh, Pass: animesh@2008),
  * Rupee Currency System (₹), Category Badge Tag Management (Expensive, Recent uploaded, Premium, Mid range, Low range, Urgent sale),
- * RAM Selector, Direct Gallery/File Upload Components, Global Site Media Control Panel.
+ * RAM Selector, Direct Gallery/File Upload Components, Global Site Media Control Panel (Save & Apply Fix).
  */
 
 const AUTH_ID_HASH = "de472f5b951a5eb2ec32d36ccd9d2ca77c83fa8fe0d2147ecd7cae1b51d8f622";
@@ -46,7 +46,7 @@ const DEFAULT_PRODUCTS = [
     price: 68000,
     currency: "₹",
     badge: "Mid range",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBfA1ZpMWg_eTW_NyZbhwHAof-azoul7Z81JiJcQ_hYp2T_BYvJM_AMZuPoCcbpM0eG-CxO-Cz5LVFWKCEtDcbDHxPqiXemjpf00FrKpbvtt6rEXEvrwimptThC5PiEU14_LOvc3ClRK4H4Yg9rO-RyC95iAmq4w0SPmNWIHyEkgrzMXQPJQjWR991nMojl4Q3OBHDP7QhxmtPO7Ndc4mR3rysv7eC7Uvn2OPDxJ-Njff_CDXl1p1Szhw",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBfA1ZpMWg_eTW_NyZbhwHAof-azoul7Z81JiJcQ_hYp2T_BYvJM_AMZuPoCcbpM0eG-CxO-Cz5LVFWKCEtDcbDHxPqiXemjpf00FrKpbvtt6rEXEvrwimptThC5PiEU14_LOvc3ClRK4H4Yg9rO-RyC95iAmq4w0SPmNWIHyEkgrzMXJQjWR991nMojl4Q3OBHDP7QhxmtPO7Ndc4mR3rysv7eC7Uvn2OPDxJ-Njff_CDXl1p1Szhw",
     description: "Silver Ghost: Razor-thin aerospace aluminum chassis side profile shot."
   },
   {
@@ -540,7 +540,6 @@ function renderAdminProducts() {
   });
 }
 
-/* Edit Product Modal Logic with File Upload Picker */
 function openEditModal(productId) {
   const prod = adminProducts.find(p => p.id === productId);
   if (!prod) return;
@@ -640,7 +639,6 @@ function deleteProduct(productId) {
   showToast('Item Deleted', 'Product has been removed from catalog.');
 }
 
-/* Add Custom Product Form with Direct File Picker */
 function toggleAddProductForm() {
   const container = document.getElementById('admin-add-product-container');
   if (container) container.classList.toggle('hidden');
@@ -699,59 +697,69 @@ function initAddProductForm() {
       if (previewEl) previewEl.innerHTML = `<span class="text-xs text-secondary">Image Preview</span>`;
       toggleAddProductForm();
       renderAdminProducts();
-      showToast('Item Added', `${title} is now published in store catalog for ₹${price.toLocaleString('en-IN')}!`);
+      showToast('Item Added', `${title} published to catalog for ₹${price.toLocaleString('en-IN')}!`);
     });
   }
 }
 
 /* ==========================================
-   5. GLOBAL SITE MEDIA CONTROL PANEL
+   5. GLOBAL SITE MEDIA CONTROL PANEL (ROBUST FIX)
    ========================================== */
 function initSiteImagesControl() {
-  const form = document.getElementById('admin-site-images-form');
-  if (!form) return;
-
   const existingImages = JSON.parse(localStorage.getItem('hunthub_site_images')) || {};
   siteImagesState = { ...existingImages };
 
-  // Bind file readers for site images
-  bindImageFileReader('site-img-logo-file', 'logoUrl', 'prev-site-logo');
-  bindImageFileReader('site-img-herobg-file', 'heroBgUrl', 'prev-site-herobg');
-  bindImageFileReader('site-img-sovereign-file', 'sovereignImgUrl', 'prev-site-sovereign');
-  bindImageFileReader('site-img-heritage-file', 'heritageImgUrl', 'prev-site-heritage');
-  bindImageFileReader('site-img-optics-file', 'opticsImgUrl', 'prev-site-optics');
-  bindImageFileReader('site-img-aegis-file', 'aegisImgUrl', 'prev-site-aegis');
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    localStorage.setItem('hunthub_site_images', JSON.stringify(siteImagesState));
-    showToast('Global Media Saved', 'Website static images updated successfully!');
-  });
+  bindImageSlot('site-img-logo-file', 'site-img-logo-url', 'logoUrl', 'prev-site-logo');
+  bindImageSlot('site-img-herobg-file', 'site-img-herobg-url', 'heroBgUrl', 'prev-site-herobg');
+  bindImageSlot('site-img-sovereign-file', 'site-img-sovereign-url', 'sovereignImgUrl', 'prev-site-sovereign');
+  bindImageSlot('site-img-heritage-file', 'site-img-heritage-url', 'heritageImgUrl', 'prev-site-heritage');
+  bindImageSlot('site-img-optics-file', 'site-img-optics-url', 'opticsImgUrl', 'prev-site-optics');
+  bindImageSlot('site-img-aegis-file', 'site-img-aegis-url', 'aegisImgUrl', 'prev-site-aegis');
 }
 
-function bindImageFileReader(fileInputId, stateKey, previewId) {
-  const input = document.getElementById(fileInputId);
+function bindImageSlot(fileInputId, urlInputId, stateKey, previewId) {
+  const fileInput = document.getElementById(fileInputId);
+  const urlInput = document.getElementById(urlInputId);
   const preview = document.getElementById(previewId);
 
-  // Set initial preview if exists in state
+  if (urlInput && siteImagesState[stateKey]) {
+    urlInput.value = siteImagesState[stateKey];
+  }
+
   if (preview && siteImagesState[stateKey]) {
     preview.innerHTML = `<img src="${siteImagesState[stateKey]}" class="w-full h-full object-contain">`;
   }
 
-  if (input) {
-    input.addEventListener('change', (e) => {
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (event) => {
           const dataUrl = event.target.result;
           siteImagesState[stateKey] = dataUrl;
+          if (urlInput) urlInput.value = dataUrl;
           if (preview) preview.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-contain">`;
         };
         reader.readAsDataURL(file);
       }
     });
   }
+
+  if (urlInput) {
+    urlInput.addEventListener('input', (e) => {
+      const url = e.target.value.trim();
+      if (url) {
+        siteImagesState[stateKey] = url;
+        if (preview) preview.innerHTML = `<img src="${url}" class="w-full h-full object-contain">`;
+      }
+    });
+  }
+}
+
+function saveAndApplySiteImages() {
+  localStorage.setItem('hunthub_site_images', JSON.stringify(siteImagesState));
+  showToast('Site Media Applied', 'All global website images saved & published live!');
 }
 
 function resetSiteImages() {

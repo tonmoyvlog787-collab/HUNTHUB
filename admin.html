@@ -166,7 +166,7 @@
       <button id="tab-siteimages-btn" onclick="switchAdminTab('siteimages')" 
               class="px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-transparent text-secondary hover:text-white transition-colors shrink-0 flex items-center gap-2">
         <span class="material-symbols-outlined text-base">image</span>
-        <span>Global Site Image Control</span>
+        <span>Global Site Media Control</span>
       </button>
 
       <button id="tab-whatsapp-btn" onclick="switchAdminTab('whatsapp')" 
@@ -289,27 +289,35 @@
     <!-- ==================== TAB 3: GLOBAL SITE IMAGE CONTROL ==================== -->
     <section id="tab-content-siteimages" class="space-y-6 hidden">
       <div class="bg-dark-card border border-accent/20 p-6 sm:p-8 space-y-6 max-w-4xl mx-auto">
-        <div class="border-b border-dark-border pb-4">
-          <h2 class="font-display text-2xl text-gold font-bold">Global Site Media & Image Control</h2>
-          <p class="font-body text-xs text-secondary mt-1">Upload and customize all static website imagery directly from your Admin Dashboard.</p>
+        <div class="border-b border-dark-border pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 class="font-display text-2xl text-gold font-bold">Global Site Media & Image Control</h2>
+            <p class="font-body text-xs text-secondary mt-1">Upload files or enter image URLs to change all static website imagery directly.</p>
+          </div>
+
+          <button type="button" onclick="saveAndApplySiteImages()" class="btn-gold-shimmer px-6 py-2.5 font-label text-xs font-bold uppercase tracking-wider btn-classic">
+            Save & Apply Site Media
+          </button>
         </div>
 
-        <form id="admin-site-images-form" class="space-y-6">
+        <form id="admin-site-images-form" class="space-y-6" onsubmit="event.preventDefault(); saveAndApplySiteImages();">
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <!-- 1. Site Brand Logo -->
-            <div class="bg-dark-bg p-4 border border-dark-border space-y-2">
+            <div class="bg-dark-bg p-4 border border-dark-border space-y-3">
               <label class="font-label text-xs text-gold font-bold block">1. Website Header Logo Icon</label>
               <input type="file" id="site-img-logo-file" accept="image/*" class="w-full text-xs text-white bg-dark-card p-2 border border-dark-border cursor-pointer">
+              <input type="url" id="site-img-logo-url" placeholder="Or enter Image URL (https://...)" class="w-full bg-dark-card border border-dark-border px-3 py-1.5 text-xs text-white focus:outline-none focus:border-gold">
               <div id="prev-site-logo" class="h-16 w-full border border-dark-border flex items-center justify-center bg-dark-card overflow-hidden">
                 <span class="text-xs text-secondary">Default Icon</span>
               </div>
             </div>
 
             <!-- 2. Hero Background Banner -->
-            <div class="bg-dark-bg p-4 border border-dark-border space-y-2">
+            <div class="bg-dark-bg p-4 border border-dark-border space-y-3">
               <label class="font-label text-xs text-gold font-bold block">2. Hero Banner Background Image</label>
               <input type="file" id="site-img-herobg-file" accept="image/*" class="w-full text-xs text-white bg-dark-card p-2 border border-dark-border cursor-pointer">
+              <input type="url" id="site-img-herobg-url" placeholder="Or enter Image URL (https://...)" class="w-full bg-dark-card border border-dark-border px-3 py-1.5 text-xs text-white focus:outline-none focus:border-gold">
               <div id="prev-site-herobg" class="h-16 w-full border border-dark-border flex items-center justify-center bg-dark-card overflow-hidden">
                 <span class="text-xs text-secondary">Default Gradient</span>
               </div>
@@ -318,18 +326,20 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <!-- 3. Sovereign Edition Phone -->
-            <div class="bg-dark-bg p-4 border border-dark-border space-y-2">
+            <div class="bg-dark-bg p-4 border border-dark-border space-y-3">
               <label class="font-label text-xs text-gold font-bold block">3. Exclusive Sovereign Edition Image</label>
               <input type="file" id="site-img-sovereign-file" accept="image/*" class="w-full text-xs text-white bg-dark-card p-2 border border-dark-border cursor-pointer">
+              <input type="url" id="site-img-sovereign-url" placeholder="Or enter Image URL (https://...)" class="w-full bg-dark-card border border-dark-border px-3 py-1.5 text-xs text-white focus:outline-none focus:border-gold">
               <div id="prev-site-sovereign" class="h-24 w-full border border-dark-border flex items-center justify-center bg-dark-card overflow-hidden">
                 <span class="text-xs text-secondary">Current Phone Image</span>
               </div>
             </div>
 
             <!-- 4. Heritage Titanium Bento -->
-            <div class="bg-dark-bg p-4 border border-dark-border space-y-2">
+            <div class="bg-dark-bg p-4 border border-dark-border space-y-3">
               <label class="font-label text-xs text-gold font-bold block">4. Heritage Titanium Feature Image</label>
               <input type="file" id="site-img-heritage-file" accept="image/*" class="w-full text-xs text-white bg-dark-card p-2 border border-dark-border cursor-pointer">
+              <input type="url" id="site-img-heritage-url" placeholder="Or enter Image URL (https://...)" class="w-full bg-dark-card border border-dark-border px-3 py-1.5 text-xs text-white focus:outline-none focus:border-gold">
               <div id="prev-site-heritage" class="h-24 w-full border border-dark-border flex items-center justify-center bg-dark-card overflow-hidden">
                 <span class="text-xs text-secondary">Current Bento Image</span>
               </div>
@@ -338,18 +348,20 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <!-- 5. Optics Lens Feature -->
-            <div class="bg-dark-bg p-4 border border-dark-border space-y-2">
+            <div class="bg-dark-bg p-4 border border-dark-border space-y-3">
               <label class="font-label text-xs text-gold font-bold block">5. Optical Purity Leica Lens Image</label>
               <input type="file" id="site-img-optics-file" accept="image/*" class="w-full text-xs text-white bg-dark-card p-2 border border-dark-border cursor-pointer">
+              <input type="url" id="site-img-optics-url" placeholder="Or enter Image URL (https://...)" class="w-full bg-dark-card border border-dark-border px-3 py-1.5 text-xs text-white focus:outline-none focus:border-gold">
               <div id="prev-site-optics" class="h-20 w-full border border-dark-border flex items-center justify-center bg-dark-card overflow-hidden">
                 <span class="text-xs text-secondary">Current Optics Image</span>
               </div>
             </div>
 
             <!-- 6. Aegis Security Feature -->
-            <div class="bg-dark-bg p-4 border border-dark-border space-y-2">
+            <div class="bg-dark-bg p-4 border border-dark-border space-y-3">
               <label class="font-label text-xs text-gold font-bold block">6. Aegis Security Shield Image</label>
               <input type="file" id="site-img-aegis-file" accept="image/*" class="w-full text-xs text-white bg-dark-card p-2 border border-dark-border cursor-pointer">
+              <input type="url" id="site-img-aegis-url" placeholder="Or enter Image URL (https://...)" class="w-full bg-dark-card border border-dark-border px-3 py-1.5 text-xs text-white focus:outline-none focus:border-gold">
               <div id="prev-site-aegis" class="h-20 w-full border border-dark-border flex items-center justify-center bg-dark-card overflow-hidden">
                 <span class="text-xs text-secondary">Current Security Image</span>
               </div>
@@ -357,7 +369,7 @@
           </div>
 
           <div class="pt-4 border-t border-dark-border flex gap-4">
-            <button type="submit" class="bg-gold text-primary px-8 py-3 font-label text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors">
+            <button type="button" onclick="saveAndApplySiteImages()" class="bg-gold text-primary px-8 py-3 font-label text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors">
               Save & Apply Site Media
             </button>
             <button type="button" onclick="resetSiteImages()" class="bg-dark-border text-white px-5 py-3 font-label text-xs uppercase tracking-wider">
