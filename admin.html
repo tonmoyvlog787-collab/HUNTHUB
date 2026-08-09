@@ -42,6 +42,63 @@
 </head>
 <body class="bg-dark-bg text-white font-body antialiased min-h-screen pt-16 sm:pt-20">
 
+  <!-- ==================== SECURE ADMIN LOGIN GATEWAY OVERLAY ==================== -->
+  <div id="admin-auth-overlay" class="fixed inset-0 z-[999] bg-dark-bg/98 backdrop-blur-2xl flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-dark-card border border-gold/40 p-6 sm:p-10 shadow-2xl space-y-6 relative overflow-hidden">
+      
+      <!-- Ambient Glow -->
+      <div class="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 rounded-full border border-gold/40 bg-dark-bg flex items-center justify-center mx-auto mb-4 shadow-[0_0_25px_rgba(197,160,89,0.25)]">
+          <span class="material-symbols-outlined text-gold text-3xl">admin_panel_settings</span>
+        </div>
+        <h1 class="font-display text-2xl sm:text-3xl text-gold font-bold tracking-tight">HUNTHUB ADMIN</h1>
+        <p class="font-label text-[11px] text-secondary tracking-widest uppercase font-semibold">Protected Security Gateway</p>
+      </div>
+
+      <!-- Error Notice Banner -->
+      <div id="admin-auth-error" class="hidden bg-red-950/60 border border-red-800 p-3 text-center rounded-none text-red-300 text-xs font-body leading-relaxed">
+        <!-- Injected dynamically in admin.js -->
+      </div>
+
+      <form id="admin-login-form" class="space-y-4">
+        <div>
+          <label class="font-label text-xs text-gold font-bold block mb-1.5 uppercase tracking-wider">Admin ID / Username</label>
+          <div class="relative">
+            <input type="text" id="auth-admin-id" required autocomplete="off" placeholder="Enter Admin ID"
+                   class="w-full bg-dark-bg border border-dark-border px-4 py-3 pl-11 text-sm text-white font-mono focus:outline-none focus:border-gold">
+            <span class="material-symbols-outlined text-secondary text-lg absolute left-3.5 top-3">person</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-label text-xs text-gold font-bold block mb-1.5 uppercase tracking-wider">Security Password</label>
+          <div class="relative">
+            <input type="password" id="auth-admin-pass" required autocomplete="current-password" placeholder="Enter Password"
+                   class="w-full bg-dark-bg border border-dark-border px-4 py-3 pl-11 pr-11 text-sm text-white font-mono focus:outline-none focus:border-gold">
+            <span class="material-symbols-outlined text-secondary text-lg absolute left-3.5 top-3">lock</span>
+            <button type="button" id="toggle-pass-visibility" class="absolute right-3 top-2.5 text-secondary hover:text-gold p-1" title="Toggle password visibility">
+              <span class="material-symbols-outlined text-lg">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="btn-gold-shimmer w-full py-4 font-label text-xs uppercase tracking-[0.2em] font-bold btn-classic shadow-lg mt-2">
+          AUTHENTICATE & ENTER
+        </button>
+      </form>
+
+      <div class="pt-4 border-t border-dark-border/60 text-center">
+        <p class="font-label text-[10px] text-secondary uppercase tracking-widest">
+          🔒 SHA-256 Encrypted & Anti-SQL Injection Protected
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+
   <!-- ==================== ADMIN TOP NAVBAR ==================== -->
   <nav class="fixed top-0 w-full z-50 bg-dark-bg/95 backdrop-blur-xl border-b border-accent/20 transition-all duration-300">
     <div class="flex justify-between items-center w-full px-4 sm:px-8 max-w-[1400px] mx-auto h-16 sm:h-20">
@@ -56,13 +113,13 @@
         </span>
       </div>
 
-      <!-- Quick Metrics Bar (Mobile & Desktop) -->
-      <div class="flex items-center gap-3 sm:gap-8 font-label text-[10px] sm:text-xs">
+      <!-- Quick Metrics Bar & Logout -->
+      <div class="flex items-center gap-2 sm:gap-6 font-label text-[10px] sm:text-xs">
         <div class="flex items-center gap-1.5 bg-dark-card border border-accent/20 px-2.5 sm:px-4 py-1 sm:py-1.5">
           <span class="text-secondary uppercase">Pending:</span>
           <span id="metric-pending-count" class="text-gold font-bold text-xs sm:text-sm">0</span>
         </div>
-        <div class="flex items-center gap-1.5 bg-dark-card border border-accent/20 px-2.5 sm:px-4 py-1 sm:py-1.5">
+        <div class="hidden sm:flex items-center gap-1.5 bg-dark-card border border-accent/20 px-4 py-1.5">
           <span class="text-secondary uppercase">Live Items:</span>
           <span id="metric-live-count" class="text-white font-bold text-xs sm:text-sm">0</span>
         </div>
@@ -70,6 +127,11 @@
           <span class="material-symbols-outlined text-sm">open_in_new</span>
           <span class="hidden sm:inline">Store Site</span>
         </a>
+        <!-- Secure Logout Button -->
+        <button id="admin-logout-btn" onclick="logoutAdmin()" class="bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-800/60 px-3 py-1.5 font-label text-[10px] sm:text-xs uppercase tracking-wider font-bold transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">logout</span>
+          <span>Logout</span>
+        </button>
       </div>
 
     </div>

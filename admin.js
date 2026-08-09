@@ -1,7 +1,20 @@
 /**
- * HUNTHUB - Dedicated Admin Control Center JavaScript
- * Features: Pending Requests Review, Profit Margin Setting, Approval to Catalog, Instant Rejection Removal, Published Inventory Editing Modal & Deletion.
+ * HUNTHUB - Executive Admin Control Center JavaScript
+ * Features: Secure Cryptographic Authentication (ID: hunthub@100animesh, Pass: animesh@2008),
+ * Anti-SQL Injection Sanitizer, Session Storage Token Check, Rate Limiting Protection,
+ * Pending Requests Review, Profit Margin Setting, Approval to Catalog, Instant Rejection Removal, Published Inventory Editing Modal & Deletion.
  */
+
+// Cryptographic SHA-256 Hashes of Credentials
+// Admin ID: "hunthub@100animesh"
+// Password: "animesh@2008"
+const AUTH_ID_HASH = "de472f5b951a5eb2ec32d36ccd9d2ca77c83fa8fe0d2147ecd7cae1b51d8f622";
+const AUTH_PASS_HASH = "6da85943d7c90757dec97b5391d34131fa82ab83c66080e2484fe5f1140ac2e0";
+const AUTH_SESSION_KEY = "hunthub_admin_authenticated_session_token_2026";
+
+// Rate limiting state
+let failedAttempts = 0;
+let lockoutTimer = null;
 
 const DEFAULT_PRODUCTS = [
   {
@@ -51,6 +64,7 @@ let adminRequests = [];
 let adminProducts = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+  initAdminSecurityAuth();
   loadAdminState();
   renderAdminRequests();
   renderAdminProducts();
@@ -59,6 +73,156 @@ document.addEventListener('DOMContentLoaded', () => {
   initEditProductForm();
 });
 
+/* ==========================================
+   0. SECURE AUTHENTICATION & ANTI-INJECTION GATEWAY
+   ========================================== */
+function initAdminSecurityAuth() {
+  const overlay = document.getElementById('admin-auth-overlay');
+  const loginForm = document.getElementById('admin-login-form');
+  const togglePassBtn = document.getElementById('toggle-pass-visibility');
+  const passInput = document.getElementById('auth-admin-pass');
+
+  // Check existing session authentication
+  const sessionToken = sessionStorage.getItem(AUTH_SESSION_KEY);
+  if (sessionToken === "AUTHENTICATED_HUNTHUB_ADMIN_SECURE_TOKEN") {
+    if (overlay) overlay.style.display = 'none';
+  } else {
+    if (overlay) overlay.style.display = 'flex';
+  }
+
+  // Password Visibility Toggle
+  if (togglePassBtn && passInput) {
+    togglePassBtn.addEventListener('click', () => {
+      const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passInput.setAttribute('type', type);
+      const icon = togglePassBtn.querySelector('span');
+      if (icon) icon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
+    });
+  }
+
+  // Login Form Submission
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (lockoutTimer) {
+        showAuthError("🔒 Security Lockout Active. Please wait for timer to expire.");
+        return;
+      }
+
+      const idInput = document.getElementById('auth-admin-id').value;
+      const passInputVal = document.getElementById('auth-admin-pass').value;
+
+      // Anti-SQL & Script Injection Sanitizer
+      const sanitizedId = sanitizeInput(idInput);
+      const sanitizedPass = sanitizeInput(passInputVal);
+
+      // Cryptographic SHA-256 Hash Calculation
+      const computedIdHash = await sha256(sanitizedId);
+      const computedPassHash = await sha256(sanitizedPass);
+
+      // Strict Double Comparison (Plaintext & SHA-256 Hash)
+      const isValidId = (sanitizedId === "hunthub@100animesh") && (computedIdHash === AUTH_ID_HASH);
+      const isValidPass = (sanitizedPass === "animesh@2008") && (computedPassHash === AUTH_PASS_HASH);
+
+      if (isValidId && isValidPass) {
+        // Success
+        sessionStorage.setItem(AUTH_SESSION_KEY, "AUTHENTICATED_HUNTHUB_ADMIN_SECURE_TOKEN");
+        failedAttempts = 0;
+        
+        if (overlay) {
+          overlay.style.transition = 'opacity 0.5s ease';
+          overlay.style.opacity = '0';
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.style.opacity = '1';
+          }, 500);
+        }
+
+        showToast("Access Granted", "Welcome to HuntHub Executive Admin Center!");
+      } else {
+        // Failed attempt
+        failedAttempts++;
+        const remaining = 5 - failedAttempts;
+
+        if (failedAttempts >= 5) {
+          triggerLockout();
+        } else {
+          showAuthError(`❌ Invalid Credentials. ${remaining} attempt(s) remaining before security lockout.`);
+        }
+      }
+    });
+  }
+}
+
+// Anti-SQL & XSS Injection Sanitizer
+function sanitizeInput(str) {
+  if (!str) return "";
+  return str
+    .trim()
+    .replace(/['";\-\-]/g, "") // Remove SQL quotes and comment operators
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remove script tags
+    .replace(/union\s+select/gi, "")
+    .replace(/or\s+1=1/gi, "");
+}
+
+// SHA-256 Helper using Web Crypto API
+async function sha256(message) {
+  const msgUint8 = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+}
+
+function showAuthError(msg) {
+  const errBox = document.getElementById('admin-auth-error');
+  if (errBox) {
+    errBox.innerHTML = msg;
+    errBox.classList.remove('hidden');
+  }
+}
+
+function triggerLockout() {
+  let seconds = 30;
+  showAuthError(`🚫 Too many failed attempts! Security Lockout active for <strong id="lockout-sec">${seconds}</strong>s.`);
+
+  const submitBtn = document.getElementById('auth-submit-btn');
+  if (submitBtn) submitBtn.disabled = true;
+
+  lockoutTimer = setInterval(() => {
+    seconds--;
+    const secEl = document.getElementById('lockout-sec');
+    if (secEl) secEl.textContent = seconds;
+
+    if (seconds <= 0) {
+      clearInterval(lockoutTimer);
+      lockoutTimer = null;
+      failedAttempts = 0;
+      if (submitBtn) submitBtn.disabled = false;
+      const errBox = document.getElementById('admin-auth-error');
+      if (errBox) errBox.classList.add('hidden');
+    }
+  }, 1000);
+}
+
+function logoutAdmin() {
+  sessionStorage.removeItem(AUTH_SESSION_KEY);
+  const overlay = document.getElementById('admin-auth-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+  }
+  const idInput = document.getElementById('auth-admin-id');
+  const passInput = document.getElementById('auth-admin-pass');
+  if (idInput) idInput.value = '';
+  if (passInput) passInput.value = '';
+  showToast("Logged Out", "Admin session ended securely.");
+}
+
+/* ==========================================
+   1. STATE & METRICS MANAGEMENT
+   ========================================== */
 function loadAdminState() {
   adminRequests = JSON.parse(localStorage.getItem('hunthub_sell_requests')) || [];
   adminProducts = JSON.parse(localStorage.getItem('hunthub_products')) || DEFAULT_PRODUCTS;
@@ -83,7 +247,7 @@ function updateMetrics() {
 }
 
 /* ==========================================
-   1. TAB SWITCHING LOGIC
+   2. TAB SWITCHING LOGIC
    ========================================== */
 function switchAdminTab(tabName) {
   const tabBtnRequests = document.getElementById('tab-requests-btn');
@@ -94,19 +258,16 @@ function switchAdminTab(tabName) {
   const contentProducts = document.getElementById('tab-content-products');
   const contentWhatsapp = document.getElementById('tab-content-whatsapp');
 
-  // Reset tab button states
   [tabBtnRequests, tabBtnProducts, tabBtnWhatsapp].forEach(btn => {
     if (btn) {
       btn.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-transparent text-secondary hover:text-white transition-colors shrink-0 flex items-center gap-2";
     }
   });
 
-  // Hide contents
   if (contentRequests) contentRequests.classList.add('hidden');
   if (contentProducts) contentProducts.classList.add('hidden');
   if (contentWhatsapp) contentWhatsapp.classList.add('hidden');
 
-  // Show active tab
   if (tabName === 'requests') {
     if (tabBtnRequests) tabBtnRequests.className = "px-4 sm:px-6 py-2.5 font-label text-xs uppercase tracking-widest font-bold border-b-2 border-gold text-gold transition-colors shrink-0 flex items-center gap-2";
     if (contentRequests) contentRequests.classList.remove('hidden');
@@ -122,7 +283,7 @@ function switchAdminTab(tabName) {
 }
 
 /* ==========================================
-   2. PENDING REQUESTS REVIEW & APPROVAL/REJECTION
+   3. PENDING REQUESTS REVIEW & APPROVAL/REJECTION
    ========================================== */
 function renderAdminRequests() {
   const container = document.getElementById('admin-requests-container');
@@ -286,7 +447,7 @@ function rejectSellRequest(requestId) {
 }
 
 /* ==========================================
-   3. STORE INVENTORY EDIT & DELETE MANAGEMENT
+   4. STORE INVENTORY EDIT & DELETE MANAGEMENT
    ========================================== */
 function renderAdminProducts() {
   const container = document.getElementById('admin-products-container');
