@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>HUNTHUB - Digital Craftsmanship & Luxury Mobile Marketplace</title>
+  
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Custom Design System Styles -->
+  <link rel="stylesheet" href="style.css"/>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#1A1A1A",
+            "secondary": "#6B6A65",
+            "surface": "#F9F7F2",
+            "surface-low": "#F3F0E9",
+            "accent": "#C5A059",
+            "gold": "#C5A059",
+            "gold-light": "#E9C176"
+          },
+          fontFamily: {
+            "display": ["Playfair Display", "serif"],
+            "body": ["Source Serif 4", "serif"],
+            "label": ["Montserrat", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-surface text-primary font-body antialiased selection:bg-gold selection:text-white pt-20">
+
+  <!-- ==================== STARTING LOADING INTRO SCREEN ==================== -->
+  <div id="loading-screen" aria-label="Welcome Loading Screen">
+    <div class="flex flex-col items-center justify-center text-center px-6">
+      <div class="w-16 h-16 rounded-full border border-gold/40 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(197,160,89,0.3)] animate-pulse">
+        <span class="material-symbols-outlined text-gold text-3xl">diamond</span>
+      </div>
+
+      <h1 class="intro-brand-title">WELCOME TO HUNTHUB</h1>
+      
+      <p class="intro-developer-credit">
+        DEVELOPED BY <span class="text-white font-bold border-b border-gold pb-0.5">TONMOY BORA</span>
+      </p>
+
+      <div class="intro-progress-bar">
+        <div class="intro-progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <nav class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl border-b border-accent/20 transition-all duration-500">
+    <div class="flex justify-between items-center w-full px-6 md:px-12 max-w-[1280px] mx-auto h-20">
+      
+      <!-- Left Navigation Links (Desktop) -->
+      <div class="hidden lg:flex items-center gap-7 font-label text-[11px] font-semibold tracking-[0.15em] text-secondary">
+        <a class="nav-link hover:text-primary transition-colors link-gold-underline py-1" href="#collections">Collections</a>
+        <a class="nav-link hover:text-primary transition-colors link-gold-underline py-1" href="#exclusive">Exclusive</a>
+        <a class="nav-link hover:text-primary transition-colors link-gold-underline py-1" href="#sell-device">Sell Device</a>
+        <a class="nav-link hover:text-primary transition-colors link-gold-underline py-1" href="#heritage">Heritage</a>
+        <a class="nav-link hover:text-primary transition-colors link-gold-underline py-1" href="#selections">Your Selections</a>
+      </div>
+
+      <!-- Brand Logo (Center) -->
+      <a class="font-display font-bold text-2xl md:text-3xl tracking-tighter text-primary hover:opacity-90 transition-opacity" href="#">
+        HUNTHUB
+      </a>
+
+      <!-- Right Actions / Utilities -->
+      <div class="flex items-center gap-4">
+        <!-- WhatsApp Direct Chat Button -->
+        <button onclick="buyProductViaWhatsApp('General Inquiry', 'N/A')" class="btn-whatsapp px-4 py-2 font-label text-[10px] uppercase font-bold tracking-widest flex items-center gap-1.5 btn-classic shadow-sm" title="Chat on WhatsApp (+91 7086869464)">
+          <span class="material-symbols-outlined text-sm">chat</span>
+          <span>WhatsApp (+91 7086869464)</span>
+        </button>
+
+        <!-- Cart Bag Icon with Counter -->
+        <a href="#selections" class="icon-btn text-accent hover:text-primary p-2 relative flex items-center justify-center" title="View Your Selections" data-interactive="true">
+          <span class="material-symbols-outlined text-[24px]">shopping_bag</span>
+          <span id="cart-badge" class="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-label w-4 h-4 rounded-full flex items-center justify-center badge-pulse">1</span>
+        </a>
+
+        <!-- Mobile Menu Toggle -->
+        <button id="mobile-menu-btn" class="lg:hidden icon-btn text-primary p-2" title="Toggle Navigation Menu">
+          <span class="material-symbols-outlined text-[26px]">menu</span>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Mobile Navigation Overlay -->
+  <div id="mobile-nav-overlay" class="fixed inset-0 z-50 bg-primary/95 backdrop-blur-2xl hidden flex-col justify-center items-center gap-7 text-white">
+    <button id="mobile-menu-close" class="absolute top-6 right-6 text-gold p-4 icon-btn">
+      <span class="material-symbols-outlined text-3xl">close</span>
+    </button>
+    <a class="font-display text-3xl text-gold mb-2" href="#">HUNTHUB</a>
+    <a class="font-label text-base tracking-widest hover:text-gold transition-colors" href="#collections">Collections</a>
+    <a class="font-label text-base tracking-widest hover:text-gold transition-colors" href="#exclusive">Exclusive Edition</a>
+    <a class="font-label text-base tracking-widest hover:text-gold transition-colors" href="#sell-device">Sell Your Phone</a>
+    <a class="font-label text-base tracking-widest hover:text-gold transition-colors" href="#heritage">Heritage & Craft</a>
+    <a class="font-label text-base tracking-widest hover:text-gold transition-colors" href="#selections">Your Selections</a>
+  </div>
+
+
+  <!-- ==================== HERO SECTION ==================== -->
+  <header id="hero" class="relative min-h-[85vh] w-full flex flex-col items-center justify-center text-center px-6 pt-12 pb-20 overflow-hidden bg-gradient-to-b from-surface via-surface to-surface-low border-b border-accent/10">
+    
+    <!-- Background Ambient Glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
+      <div class="inline-block border border-accent/40 px-4 py-1.5 font-label text-[11px] text-accent tracking-[0.25em] uppercase mb-8 scroll-reveal">
+        Digital Craftsmanship & Exclusive Marketplace
+      </div>
+
+      <h1 class="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-primary font-bold tracking-tight leading-[1.1] mb-8 scroll-reveal delay-1">
+        Digital Craftsmanship
+      </h1>
+
+      <p class="font-body text-lg md:text-xl text-secondary max-w-2xl mb-10 leading-relaxed font-light scroll-reveal delay-2">
+        Forged from heritage. Engineered for tomorrow. Experience the pinnacle of mobile luxury by <strong class="text-primary font-semibold">HUNTHUB</strong>. Buy directly via WhatsApp or sell your premium device safely.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-5 items-center scroll-reveal delay-3">
+        <a href="#collections" class="btn-gold-shimmer font-label text-xs uppercase tracking-[0.2em] px-9 py-4 btn-classic shadow-md">
+          Discover Collections
+        </a>
+        <button onclick="buyProductViaWhatsApp('General Store Inquiry', 'N/A')" class="btn-whatsapp font-label text-xs uppercase tracking-[0.2em] px-8 py-4 btn-classic flex items-center gap-2 font-bold shadow-md">
+          <span class="material-symbols-outlined text-base">chat</span> WhatsApp Concierge
+        </button>
+        <a href="#sell-device" class="font-label text-xs uppercase tracking-[0.15em] text-primary hover:text-accent transition-colors flex items-center gap-1 border-b border-primary/40 hover:border-accent pb-0.5">
+          <span class="material-symbols-outlined text-sm">sell</span> Sell Device
+        </a>
+      </div>
+    </div>
+
+    <!-- Floating Scroll Indicator -->
+    <a href="#collections" class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-accent/70 hover:text-accent transition-colors bounce-slow">
+      <span class="font-label text-[10px] tracking-[0.25em] uppercase">Scroll</span>
+      <span class="material-symbols-outlined text-sm">south</span>
+    </a>
+  </header>
+
+
+  <!-- ==================== FRAME 1: CURATED COLLECTIONS ==================== -->
+  <section id="collections" class="w-full max-w-[1240px] mx-auto px-6 md:px-16 py-24 border-b border-accent/10">
+    
+    <!-- Section Header -->
+    <div class="text-center max-w-2xl mx-auto mb-20">
+      <span class="font-label text-xs text-accent uppercase tracking-[0.2em] mb-4 block scroll-reveal">The Masterpieces</span>
+      <h2 class="font-display text-3xl sm:text-5xl text-primary font-bold mb-6 scroll-reveal delay-1">Curated Collections</h2>
+      <p class="font-body text-secondary text-base md:text-lg leading-relaxed scroll-reveal delay-2 font-light">
+        Explore our definitive range of digital craftsmanship. Buy instantly via WhatsApp (<strong class="text-primary">+91 7086869464</strong>) or inspect photo details.
+      </p>
+    </div>
+
+    <!-- Dynamic Products Grid Container -->
+    <div id="products-grid-container" class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-24">
+      <!-- Populated dynamically in app.js -->
+    </div>
+  </section>
+
+
+  <!-- ==================== FRAME 2: THE SOVEREIGN EDITION (EXCLUSIVE) ==================== -->
+  <section id="exclusive" class="w-full bg-surface-low py-24 border-b border-accent/10">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-16">
+      
+      <!-- Hero Feature Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-center mb-24">
+        
+        <!-- Text Details -->
+        <div class="md:col-span-5 flex flex-col space-y-6 scroll-reveal-left">
+          <div class="inline-block border border-accent px-3 py-1 font-label text-[10px] text-accent uppercase tracking-widest w-fit">
+            Exclusive Edition
+          </div>
+          <h2 class="font-display text-4xl md:text-5xl text-primary font-bold leading-tight">
+            The Sovereign Edition
+          </h2>
+          <p class="font-body text-secondary text-base leading-relaxed font-light">
+            A masterpiece of digital craftsmanship. Forged from hand-polished titanium and finished in Sovereign Gold, this device represents the pinnacle of technological luxury and uncompromising design.
+          </p>
+
+          <div class="pt-6 flex items-center gap-6">
+            <button onclick="buyProductViaWhatsApp('The Sovereign Edition (Exclusive)', '$4,500')" 
+                    class="bg-primary text-white font-label text-xs uppercase tracking-[0.2em] px-8 py-4 btn-classic hover:bg-gold hover:text-primary transition-colors flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">chat</span> Acquire via WhatsApp
+            </button>
+            <span class="font-display text-2xl text-accent font-semibold">$4,500</span>
+          </div>
+        </div>
+
+        <!-- Featured Phone Image -->
+        <div class="md:col-span-7 relative h-[450px] md:h-[600px] flex items-center justify-center photo-clickable scroll-reveal-right">
+          <img class="w-full h-full object-contain drop-shadow-2xl z-10" 
+               data-alt="The Sovereign Edition floating smartphone with polished titanium frame and gold accents."
+               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbaohGuTaTNWdc2zVWq-b3jcfoqKVM0kWdDBnLoK-hyfDhooUxChdbxbmr6dq-JBMz3-fTkMimysN54f1RJguJ1XK2zjMwTtAxm_eAuo4v11zmczcF4vc8qpuTz5TMHPDjMyotI45nD1bAuuPszZcZ3a6kmfJSLbtYnVYdRd9Ogh95OiFk_5ATl6syDydvuxXCgSTtu-YozosZYRNIf0ojAuLsb8YdVsxrfI5dU3DR8kTddPFF4cVX2A"
+               alt="The Sovereign Edition"/>
+          <div class="absolute inset-0 bg-gold/10 rounded-full blur-3xl w-2/3 h-2/3 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+
+      </div>
+
+      <!-- Specifications / Craft Cards -->
+      <div class="text-center mb-12">
+        <h3 class="font-display text-3xl text-primary font-semibold mb-2 scroll-reveal">Uncompromising Craft</h3>
+        <p class="font-label text-xs text-secondary tracking-widest uppercase scroll-reveal delay-1">The Architecture of Luxury</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Spec 1 -->
+        <div class="bg-surface p-10 flex flex-col items-center text-center space-y-4 border border-accent/15 hover:border-gold transition-all duration-500 scroll-reveal delay-1">
+          <span class="material-symbols-outlined text-4xl text-gold font-light">diamond</span>
+          <h4 class="font-label text-xs font-bold text-primary tracking-widest uppercase">Ceramic Shield</h4>
+          <p class="font-body text-sm text-secondary leading-relaxed">
+            Tougher than any smartphone glass. Infused with nano-ceramic crystals, offering unparalleled durability and clarity for the flawless display.
+          </p>
+        </div>
+
+        <!-- Spec 2 -->
+        <div class="bg-surface p-10 flex flex-col items-center text-center space-y-4 border border-accent/15 hover:border-gold transition-all duration-500 scroll-reveal delay-2">
+          <span class="material-symbols-outlined text-4xl text-gold font-light">precision_manufacturing</span>
+          <h4 class="font-label text-xs font-bold text-primary tracking-widest uppercase">Hand-Polished Titanium</h4>
+          <p class="font-body text-sm text-secondary leading-relaxed">
+            Aerospace-grade titanium, meticulously polished by master artisans over 14 hours to achieve a mirror-like finish that is both robust and remarkably light.
+          </p>
+        </div>
+
+        <!-- Spec 3 -->
+        <div class="bg-surface p-10 flex flex-col items-center text-center space-y-4 border border-accent/15 hover:border-gold transition-all duration-500 scroll-reveal delay-3">
+          <span class="material-symbols-outlined text-4xl text-gold font-light">award_star</span>
+          <h4 class="font-label text-xs font-bold text-primary tracking-widest uppercase">Sovereign Gold Finish</h4>
+          <p class="font-body text-sm text-secondary leading-relaxed">
+            A proprietary gold vapor deposition process creates a deep, enduring hue that transcends time, reflecting the heritage of fine jewelry.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==================== USER PHONE SELLING SECTION ==================== -->
+  <section id="sell-device" class="w-full max-w-[1240px] mx-auto px-6 md:px-16 py-24 border-b border-accent/10">
+    
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <span class="font-label text-xs text-accent uppercase tracking-[0.2em] mb-4 block scroll-reveal">Pre-Owned Marketplace</span>
+      <h2 class="font-display text-3xl sm:text-5xl text-primary font-bold mb-4 scroll-reveal delay-1">Sell Your Smartphone</h2>
+      <p class="font-body text-secondary text-base leading-relaxed scroll-reveal delay-2 font-light">
+        Submit your pre-owned device for listing on HuntHub. Your submission goes to our **Admin Panel** for price approval before public publication.
+      </p>
+    </div>
+
+    <div class="max-w-3xl mx-auto bg-surface-low border border-accent/20 p-8 sm:p-12 shadow-sm scroll-reveal-zoom">
+      
+      <form id="sell-device-form" class="space-y-6">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label class="font-label text-xs text-primary font-bold block mb-2">Phone Model Name *</label>
+            <input type="text" id="sell-model" required placeholder="e.g. iPhone 15 Pro Max / Galaxy S24 Ultra" 
+                   class="w-full bg-surface border border-accent/30 px-4 py-3 font-body text-sm focus:outline-none focus:border-gold">
+          </div>
+
+          <div>
+            <label class="font-label text-xs text-primary font-bold block mb-2">Expected Selling Price ($ / ₹) *</label>
+            <input type="number" id="sell-price" required placeholder="e.g. 950" 
+                   class="w-full bg-surface border border-accent/30 px-4 py-3 font-body text-sm focus:outline-none focus:border-gold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div>
+            <label class="font-label text-xs text-primary font-bold block mb-2">Condition *</label>
+            <select id="sell-condition" class="w-full bg-surface border border-accent/30 px-4 py-3 font-body text-sm focus:outline-none focus:border-gold">
+              <option value="Mint (Flawless)">Mint (Flawless)</option>
+              <option value="Excellent (Minimal Signs)">Excellent (Minimal Signs)</option>
+              <option value="Good (Minor Wear)">Good (Minor Wear)</option>
+              <option value="Fair">Fair</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-label text-xs text-primary font-bold block mb-2">Battery Health (%)</label>
+            <input type="number" id="sell-battery" min="50" max="100" placeholder="e.g. 94" 
+                   class="w-full bg-surface border border-accent/30 px-4 py-3 font-body text-sm focus:outline-none focus:border-gold">
+          </div>
+
+          <div>
+            <label class="font-label text-xs text-primary font-bold block mb-2">Storage Capacity</label>
+            <select id="sell-storage" class="w-full bg-surface border border-accent/30 px-4 py-3 font-body text-sm focus:outline-none focus:border-gold">
+              <option value="128GB">128GB</option>
+              <option value="256GB" selected>256GB</option>
+              <option value="512GB">512GB</option>
+              <option value="1TB">1TB</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label class="font-label text-xs text-primary font-bold block mb-2">Your Full Name</label>
+            <input type="text" id="sell-name" placeholder="e.g. Alexander Vance" 
+                   class="w-full bg-surface border border-accent/30 px-4 py-3 font-body text-sm focus:outline-none focus:border-gold">
+          </div>
+
+          <div>
+            <label class="font-label text-xs text-primary font-bold block mb-2">WhatsApp / Phone Number *</label>
+            <input type="tel" id="sell-phone" required placeholder="e.g. +91 9876543210" 
+                   class="w-full bg-surface border border-accent/30 px-4 py-3 font-body text-sm focus:outline-none focus:border-gold">
+          </div>
+        </div>
+
+        <div>
+          <label class="font-label text-xs text-primary font-bold block mb-2">Upload Device Photos</label>
+          <input type="file" id="sell-images" accept="image/*" multiple 
+                 class="w-full bg-surface border border-accent/30 p-2 font-body text-xs focus:outline-none focus:border-gold">
+          <div id="sell-images-preview" class="flex gap-3 mt-3 overflow-x-auto"></div>
+        </div>
+
+        <div>
+          <label class="font-label text-xs text-primary font-bold block mb-2">Additional Description / Accessories Included</label>
+          <textarea id="sell-desc" rows="3" placeholder="Mention if original box, bill, charger, or warranty is included..." 
+                    class="w-full bg-surface border border-accent/30 px-4 py-3 font-body text-sm focus:outline-none focus:border-gold"></textarea>
+        </div>
+
+        <!-- Verification Notice -->
+        <div class="bg-surface p-4 border-l-2 border-gold flex items-start gap-3">
+          <span class="material-symbols-outlined text-gold">info</span>
+          <p class="font-body text-xs text-secondary leading-relaxed">
+            <strong>Admin Verification:</strong> Your request will be sent to the HuntHub Admin Console for price & condition evaluation before public catalog listing.
+          </p>
+        </div>
+
+        <button type="submit" class="btn-gold-shimmer w-full py-4 font-label text-xs uppercase tracking-[0.2em] font-bold btn-classic">
+          Submit Device for Admin Review
+        </button>
+
+      </form>
+
+    </div>
+
+  </section>
+
+
+  <!-- ==================== FRAME 3: HERITAGE & AEGIS SECURITY ==================== -->
+  <section id="heritage" class="w-full max-w-[1240px] mx-auto px-6 md:px-16 py-24 border-b border-accent/10">
+    <div class="flex flex-col gap-16">
+      
+      <div class="text-center max-w-2xl mx-auto">
+        <h2 class="font-display text-3xl md:text-5xl text-primary font-bold mb-4 scroll-reveal">The Heritage Series</h2>
+        <p class="font-body text-secondary text-base leading-relaxed scroll-reveal delay-1 font-light">
+          Materials sourced from antiquity, combined with the most advanced technology of the modern era.
+        </p>
+      </div>
+
+      <!-- Hero Bento Card -->
+      <div class="w-full bg-surface-low border border-accent/20 overflow-hidden flex flex-col md:flex-row min-h-[500px] scroll-reveal-zoom">
+        <div class="p-8 md:p-16 flex flex-col justify-center md:w-1/2">
+          <span class="bg-gold text-primary px-3 py-1 font-label text-[10px] w-fit mb-6 uppercase tracking-widest font-semibold">Titanium Edition</span>
+          <h3 class="font-display text-3xl md:text-4xl text-primary font-bold mb-4">Forged in Elegance</h3>
+          <p class="font-body text-secondary text-base leading-relaxed font-light">
+            A chassis machined from aerospace-grade titanium, offering unparalleled durability without compromising the minimalist aesthetic.
+          </p>
+        </div>
+        <div class="md:w-1/2 relative min-h-[300px] photo-clickable">
+          <img class="w-full h-full object-cover" 
+               data-alt="Forged in Elegance: Sleek smartphone resting on dark slate surface with soft studio lighting."
+               src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwhbuMNxGpkI7fvcUwUe1Waku-xehUqXIlsr6DpIf8cHnm42vKMYmG-MoIFXVzzYAThlF9kQH9yZGN3BFlMVLZDj4IGw3l4w_h-b-S73DE_iseMj5sDy6uqlKyt32QIiFeR1gma3Qv76fHnhAegN4Px3TsPuU2_Sbi2T-vP-0zKrtV7yiL4OlANPzD0UfgmSkJk2tNaTpbqQ5PsaUx0MYIF40CPp9Cf4DQJoBWoqsoa1PxEGqCZ-1Ugg"
+               alt="Forged in Elegance"/>
+        </div>
+      </div>
+
+      <!-- Small Stack Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Feature 1 -->
+        <div class="bg-surface-low border border-accent/20 p-8 md:p-12 flex flex-col justify-between scroll-reveal-left">
+          <div class="h-64 w-full relative mb-6 photo-clickable">
+            <img class="w-full h-full object-cover" 
+                 data-alt="Optical Purity: Leica-engineered camera lens ring in brushed gold."
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdvuYbH6ZAN-6_ft7CuRdnyOQWqxtCd6wpFGxRJtmja4hls4cVdyddVgl2oJl1KFbpY4-54SBhaPej0pPCcpxzpPzCeecSpUYz2h4WRFqLSCndwEL6hInn_7IUi_TSHnZezzKioEpCGFEBnHjhLS32-cK8dRUpOBPxDlBhey16kPk85gWO25HfLYRlSShQTwkAKy5SBqb7b3cS2OxZoa3xQCtckorj6jbxG1ZGcNCRqXX1qLTkDiKV2g"
+                 alt="Optical Purity"/>
+          </div>
+          <div>
+            <h3 class="font-display text-2xl text-primary font-semibold mb-2">Optical Purity</h3>
+            <p class="font-body text-secondary text-sm leading-relaxed">Leica-engineered optics captured in a sapphire glass housing.</p>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="bg-primary text-white border border-accent/20 p-8 md:p-12 flex flex-col justify-between scroll-reveal-right">
+          <div class="h-64 w-full relative mb-6 photo-clickable opacity-90">
+            <img class="w-full h-full object-cover" 
+                 data-alt="Aegis Security: Glowing gold encryption pattern representing digital safety."
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw3QSP4jj5p4_MT4Zt5JjonworegJ1NsupB5TUnNxbnybmtWm9tYCTGDzo6cS1mttYob6-xwx-onKqeL9kxNJwZnB7vmr9Zaolw2h1tAto7wi_GdRS8orn3etEfLeATgfSRjmHpm7fm7dW_FmLY_NLgU-BNLk0ZA6W7w5me5XLAOvAGSmpZNaTs7X1SQgquG8YnJVqrmRlEH4YXn6saMgx2rH01Mz7JpLKi5OBNE98Er2qZn-_ucVvew"
+                 alt="Aegis Security"/>
+          </div>
+          <div>
+            <h3 class="font-display text-2xl text-gold font-semibold mb-2">Aegis Security</h3>
+            <p class="font-body opacity-80 text-sm leading-relaxed">Hardware-level encryption for the uncompromising individual.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==================== FRAME 4: YOUR SELECTIONS & CONCIERGE ==================== -->
+  <section id="selections" class="w-full max-w-[1240px] mx-auto px-6 md:px-16 py-24">
+    
+    <!-- Title & Clear All Action -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-accent/20 pb-6 mb-12 gap-4">
+      <div>
+        <h2 class="font-display text-3xl md:text-5xl text-primary font-bold scroll-reveal">Your Selections</h2>
+        <p class="font-body text-xs text-secondary mt-1">Review saved luxury items or proceed to checkout via WhatsApp.</p>
+      </div>
+
+      <div class="flex items-center gap-6 scroll-reveal">
+        <!-- Clear All Button -->
+        <button id="clear-all-cart-btn" class="font-label text-xs text-red-700 hover:text-red-900 transition-colors flex items-center gap-1 border-b border-red-300 hover:border-red-700 pb-0.5 icon-btn font-bold">
+          <span class="material-symbols-outlined text-sm">delete_sweep</span> Clear All Selections
+        </button>
+
+        <a href="#collections" class="font-label text-xs text-accent hover:text-primary transition-colors border-b border-accent pb-0.5">
+          Continue Exploring
+        </a>
+      </div>
+    </div>
+
+    <!-- Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      
+      <!-- Left Column: Item List -->
+      <div class="lg:col-span-8 flex flex-col gap-8 scroll-reveal-left">
+        <article id="cart-item-article" class="flex flex-col sm:flex-row gap-8 pb-10 border-b border-accent/20 transition-all duration-300">
+          
+          <!-- Image -->
+          <div class="w-full sm:w-48 aspect-[4/5] bg-surface-low shrink-0 relative overflow-hidden photo-clickable border border-accent/10">
+            <img class="w-full h-full object-cover" 
+                 data-alt="HuntHub Series X – Obsidian Edition in matte titanium finish with gold accents."
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDT-9plcxBicthMlu8B1Hyqp5OyGfBuD7Gk1gLatoV10LKpykOQDOjtsA8Y6_22PlaUN6IJkqX-CnvCF_DC9qmNHxkE1SZLS4ALl3uEpgwNmqfLi4YwiqtIOQEryJo-wd81uNLauUyfZK7Fm1neub2gPn1f2f5PjfbLkfixAQ3L_G7swKcCFR2lY6amEjJ4nOT3qNaO1taDtECwA4CuEf93ND8H8Yf_89yXpVMP8GEdwBVTGkSw_NVV9A"
+                 alt="HuntHub Series X"/>
+          </div>
+
+          <!-- Item Specs -->
+          <div class="flex-grow flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start gap-4 mb-2">
+                <h3 class="font-display text-xl font-bold text-primary">HuntHub Series X – Obsidian Edition</h3>
+                <span class="font-serif text-lg text-accent font-semibold">$4,250</span>
+              </div>
+              <p class="font-body text-sm text-secondary leading-relaxed">
+                Forged from aerospace-grade titanium with an exclusive matte finish. Includes personalized engraving.
+              </p>
+
+              <!-- Bespoke Badges -->
+              <div class="mt-6 flex flex-col gap-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-primary"></div>
+                  <span class="font-label text-[11px] text-primary">1TB Solid State Storage</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-gold"></div>
+                  <span class="font-label text-[11px] text-primary">24k Gold Accents</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-secondary"></div>
+                  <span class="font-label text-[11px] text-primary">Engraving: "J.H."</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions Row -->
+            <div class="mt-8 flex items-center justify-between border-t border-accent/15 pt-6">
+              <div class="flex items-center gap-4 border border-accent/30 px-3 py-1 bg-surface-low">
+                <button id="qty-minus" class="icon-btn text-secondary hover:text-primary p-1">
+                  <span class="material-symbols-outlined text-[18px]">remove</span>
+                </button>
+                <span id="qty-display" class="font-label text-sm text-primary font-bold w-6 text-center">1</span>
+                <button id="qty-plus" class="icon-btn text-secondary hover:text-primary p-1">
+                  <span class="material-symbols-outlined text-[18px]">add</span>
+                </button>
+              </div>
+
+              <button id="remove-cart-item" class="font-label text-[11px] text-red-700 hover:text-red-900 font-bold uppercase tracking-wider border-b border-transparent hover:border-red-700 pb-0.5 icon-btn flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">delete</span> REMOVE ITEM
+              </button>
+            </div>
+          </div>
+
+        </article>
+      </div>
+
+      <!-- Right Column: Order Summary & Assurance -->
+      <div class="lg:col-span-4 scroll-reveal-right">
+        <div class="sticky top-28 bg-surface-low p-8 border border-accent/20 flex flex-col gap-6 shadow-sm">
+          <h3 class="font-display text-xl font-bold text-primary border-b border-accent/15 pb-4">Order Summary</h3>
+
+          <div class="flex flex-col gap-3 font-body text-sm">
+            <div class="flex justify-between items-center text-secondary">
+              <span>Subtotal</span>
+              <span id="subtotal-display" class="text-primary font-semibold">$4,250.00</span>
+            </div>
+            <div class="flex justify-between items-center text-secondary">
+              <span>Exclusive Options</span>
+              <span class="text-gold font-medium">Included</span>
+            </div>
+            <div class="flex justify-between items-center text-secondary">
+              <span>Shipping</span>
+              <span class="text-gold font-medium">Complimentary</span>
+            </div>
+          </div>
+
+          <div class="h-[1px] w-full bg-accent/20 my-1"></div>
+
+          <div class="flex justify-between items-center font-display text-xl text-primary font-bold">
+            <span>Total</span>
+            <span id="total-display" class="text-accent">$4,250.00</span>
+          </div>
+          <p class="font-label text-[10px] text-secondary text-right -mt-4">Excluding local taxes</p>
+
+          <button id="checkout-btn" class="btn-whatsapp w-full py-5 font-label text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2 btn-classic">
+            <span class="material-symbols-outlined text-[18px]">chat</span>
+            Buy via WhatsApp (+91 7086869464)
+          </button>
+
+          <!-- Guarantee Badges -->
+          <div class="pt-6 border-t border-accent/15 flex flex-col gap-4">
+            <div class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-gold text-2xl">verified_user</span>
+              <div>
+                <span class="font-label text-xs font-bold text-primary block">Global Warranty</span>
+                <span class="font-body text-xs text-secondary">Included 3-year international protection.</span>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-gold text-2xl">local_shipping</span>
+              <div>
+                <span class="font-label text-xs font-bold text-primary block">White Glove Delivery</span>
+                <span class="font-body text-xs text-secondary">Secure, hand-delivered via private courier.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==================== AUTO PHOTO CHANGER LIGHTBOX MODAL ==================== -->
+  <div id="gallery-modal" class="gallery-modal" role="dialog" aria-modal="true" aria-label="HuntHub Photo Showcase Gallery">
+    
+    <!-- Auto Timer Progress Bar -->
+    <div class="gallery-progress-bar">
+      <div id="gallery-progress-fill" class="gallery-progress-fill"></div>
+    </div>
+
+    <!-- Header Controls -->
+    <div class="flex justify-between items-center px-8 py-6 text-white border-b border-white/10 z-20">
+      <div class="flex items-center gap-4">
+        <span id="gallery-counter" class="font-label text-xs text-gold tracking-widest font-bold">PHOTO 1 OF 8</span>
+        <span class="text-white/30">|</span>
+        <span id="gallery-title" class="font-display text-lg text-white font-semibold">HuntHub Masterpiece Showcase</span>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <!-- Auto Play / Pause Toggle Button -->
+        <button id="gallery-playpause" class="icon-btn flex items-center gap-2 bg-white/10 hover:bg-gold hover:text-primary px-4 py-2 text-xs font-label uppercase tracking-widest transition-colors rounded-none">
+          <span id="gallery-play-icon" class="material-symbols-outlined text-base">pause</span>
+          <span>Auto Change</span>
+        </button>
+
+        <!-- Close Button -->
+        <button id="gallery-close" class="icon-btn text-white hover:text-gold p-2" title="Close Photo Viewer (ESC)">
+          <span class="material-symbols-outlined text-3xl">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Viewport -->
+    <div class="relative flex-grow flex items-center justify-center p-6 md:p-12 overflow-hidden">
+      
+      <!-- Previous Arrow -->
+      <button id="gallery-prev" class="absolute left-6 z-20 icon-btn text-white/70 hover:text-gold bg-black/40 hover:bg-black/80 p-4 border border-white/10" title="Previous Photo">
+        <span class="material-symbols-outlined text-3xl">chevron_left</span>
+      </button>
+
+      <!-- Displayed Image -->
+      <div class="relative max-w-4xl max-h-[70vh] flex items-center justify-center">
+        <img id="gallery-main-img" class="max-w-full max-h-[70vh] object-contain drop-shadow-2xl transition-all duration-500" src="" alt="Showcase Photo"/>
+      </div>
+
+      <!-- Next Arrow -->
+      <button id="gallery-next" class="absolute right-6 z-20 icon-btn text-white/70 hover:text-gold bg-black/40 hover:bg-black/80 p-4 border border-white/10" title="Next Photo">
+        <span class="material-symbols-outlined text-3xl">chevron_right</span>
+      </button>
+
+    </div>
+
+    <!-- Caption & Description -->
+    <div class="text-center px-6 py-3 text-white/80 max-w-2xl mx-auto">
+      <p id="gallery-desc" class="font-body text-sm font-light leading-relaxed line-clamp-2"></p>
+    </div>
+
+    <!-- Bottom Thumbnail Tray -->
+    <div class="px-8 py-4 bg-black/60 border-t border-white/10 flex justify-center items-center gap-3 overflow-x-auto" id="gallery-thumbnails">
+      <!-- Generated dynamically in app.js -->
+    </div>
+
+  </div>
+
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="w-full bg-surface-low border-t border-accent/20 pt-20 pb-12">
+    <div class="max-w-[1240px] mx-auto px-6 md:px-16 flex flex-col gap-16">
+      
+      <div class="flex flex-col md:flex-row justify-between items-start gap-12">
+        <div class="flex flex-col gap-4 max-w-md">
+          <span class="font-display font-bold text-3xl text-primary tracking-tighter">HUNTHUB</span>
+          <p class="font-body text-sm text-secondary leading-relaxed font-light">
+            Elevating the standard of digital interaction through uncompromising craftsmanship and timeless design. Developed by Tonmoy Bora.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-16">
+          <div class="flex flex-col gap-3 font-label text-xs">
+            <span class="text-primary font-bold tracking-widest uppercase mb-2">Explore</span>
+            <a class="text-secondary hover:text-gold transition-colors" href="#collections">Collections</a>
+            <a class="text-secondary hover:text-gold transition-colors" href="#exclusive">Exclusive Edition</a>
+            <a class="text-secondary hover:text-gold transition-colors" href="#sell-device">Sell Phone</a>
+            <a class="text-secondary hover:text-gold transition-colors" href="#heritage">Heritage Archive</a>
+            <a class="text-secondary hover:text-gold transition-colors" href="#selections">Your Selections</a>
+          </div>
+          <div class="flex flex-col gap-3 font-label text-xs">
+            <span class="text-primary font-bold tracking-widest uppercase mb-2">Legal & Support</span>
+            <a class="text-secondary hover:text-gold transition-colors" href="https://wa.me/917086869464" target="_blank">WhatsApp: +91 7086869464</a>
+            <a class="text-secondary hover:text-gold transition-colors" href="#">Privacy Policy</a>
+            <a class="text-secondary hover:text-gold transition-colors" href="#">Terms of Service</a>
+            <a class="text-secondary hover:text-gold transition-colors" href="#">Shipping & Returns</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-accent/15">
+        <p class="font-label text-[11px] tracking-widest text-secondary uppercase">
+          © 2026 HUNTHUB DIGITAL CRAFTSMANSHIP. DEVELOPED BY TONMOY BORA. ALL RIGHTS RESERVED.
+        </p>
+        <div class="flex gap-4">
+          <a class="text-secondary hover:text-gold transition-colors" href="https://wa.me/917086869464" target="_blank" title="WhatsApp Concierge"><span class="material-symbols-outlined text-[20px]">chat</span></a>
+          <a class="text-secondary hover:text-gold transition-colors" href="#" title="Global Region"><span class="material-symbols-outlined text-[20px]">language</span></a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+
+</body>
+</html>
